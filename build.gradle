@@ -9,7 +9,8 @@ plugins {
     id 'org.ajoberstar.git-publish' version '3.0.1'
 }
 
-
+apply plugin: 'maven-publish'
+group = 'com.github.argentlabs'
 
 ext {
     bouncycastleVersion = '1.68'
