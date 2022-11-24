@@ -72,14 +72,10 @@ public class NumericTest {
 
     @Test
     public void testQuantityDecodeLeadingZero() {
-        assertThrows(MessageDecodingException.class, () -> Numeric.decodeQuantity("0x0400"));
-        assertThrows(MessageDecodingException.class, () -> Numeric.decodeQuantity("0x001"));
-    }
-
-    @Test
-    public void testQuantityDecodeLeadingZeroException() {
-
-        assertThrows(MessageDecodingException.class, () -> Numeric.decodeQuantity("0x0400"));
+        assertEquals(Numeric.decodeQuantity("0x0400"), (BigInteger.valueOf(1024L)));
+        assertEquals(Numeric.decodeQuantity("0x001"), (BigInteger.valueOf(1L)));
+        assertEquals(Numeric.decodeQuantity("0x000"), (BigInteger.ZERO));
+        assertEquals(Numeric.decodeQuantity("0x00f"), (BigInteger.valueOf(15L)));
     }
 
     @Test
@@ -278,5 +274,22 @@ public class NumericTest {
         assertEquals("", Numeric.removeDoubleQuotes(""));
         assertEquals(" ", Numeric.removeDoubleQuotes(" "));
         assertEquals(text, Numeric.removeDoubleQuotes(text));
+    }
+
+    @Test
+    void testIsValidHexQuantity() {
+
+        assertEquals(true, Numeric.isValidHexQuantity("0x0"));
+        assertEquals(true, Numeric.isValidHexQuantity("0x9"));
+        assertEquals(true, Numeric.isValidHexQuantity("0x123f"));
+        assertEquals(true, Numeric.isValidHexQuantity("0x419E"));
+        assertEquals(true, Numeric.isValidHexQuantity("0x975d"));
+        assertEquals(true, Numeric.isValidHexQuantity("0xDC449C1C16BA0"));
+        assertEquals(true, Numeric.isValidHexQuantity("0x419E"));
+
+        assertEquals(false, Numeric.isValidHexQuantity("419E"));
+        assertEquals(false, Numeric.isValidHexQuantity("0419E"));
+        assertEquals(false, Numeric.isValidHexQuantity("0x419Erf"));
+        assertEquals(false, Numeric.isValidHexQuantity("0x419fg"));
     }
 }
