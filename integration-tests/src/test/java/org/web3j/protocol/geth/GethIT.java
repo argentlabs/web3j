@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Disabled
-@EVMTest(type = NodeType.BESU)
+@EVMTest(type = NodeType.GETH)
 public class GethIT {
 
     private Geth web3j;
@@ -41,7 +41,6 @@ public class GethIT {
         this.web3j = Geth.build(new HttpService());
     }
 
-    @Disabled
     @Test // Method not Implemented.
     public void testWeb3ClientVersion() throws Exception {
         TxPoolContent content = web3j.txPoolContent().send();
@@ -49,6 +48,7 @@ public class GethIT {
     }
 
     @Test
+    @Disabled("Deprecated. Replaced by Clef's equivalent method - 'account_new'")
     public void testPersonalAccountCreation() throws IOException {
         Admin admin = Admin.build(new HttpService());
         NewAccountIdentifier accountId = admin.personalNewAccount("web3j-geth-IT").send();

@@ -20,7 +20,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.reactivex.Flowable;
@@ -118,6 +117,6 @@ public abstract class FilterTester {
             fail("Results cannot be empty");
         }
 
-        return ethLog.getLogs().stream().map(t -> t.get()).collect(Collectors.toList());
+        return ethLog.getLogs().stream().map(EthLog.LogResult::get).toList();
     }
 }

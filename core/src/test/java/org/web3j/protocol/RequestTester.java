@@ -70,20 +70,17 @@ public abstract class RequestTester {
 
             Request request = chain.request();
             this.requestBody = request.body();
-            okhttp3.Response response =
-                    new okhttp3.Response.Builder()
-                            .request(chain.request())
-                            .protocol(Protocol.HTTP_2)
-                            .code(200)
-                            .body(
-                                    ResponseBody.create(
-                                            "{\"jsonrpc\":\"2.0\",\"method\":\"\","
-                                                    + "\"params\":[],\"id\":1}",
-                                            JSON_MEDIA_TYPE))
-                            .message("")
-                            .build();
-
-            return response;
+            return new okhttp3.Response.Builder()
+                    .request(chain.request())
+                    .protocol(Protocol.HTTP_2)
+                    .code(200)
+                    .body(
+                            ResponseBody.create(
+                                    "{\"jsonrpc\":\"2.0\",\"method\":\"\","
+                                            + "\"params\":[],\"id\":1}",
+                                    JSON_MEDIA_TYPE))
+                    .message("")
+                    .build();
         }
 
         public RequestBody getRequestBody() {

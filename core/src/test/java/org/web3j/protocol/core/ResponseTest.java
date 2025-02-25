@@ -14,6 +14,7 @@ package org.web3j.protocol.core;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import org.web3j.protocol.core.methods.response.DbGetString;
 import org.web3j.protocol.core.methods.response.DbPutHex;
 import org.web3j.protocol.core.methods.response.DbPutString;
 import org.web3j.protocol.core.methods.response.EthAccounts;
+import org.web3j.protocol.core.methods.response.EthBaseFee;
 import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthBlockNumber;
 import org.web3j.protocol.core.methods.response.EthCall;
@@ -42,10 +44,12 @@ import org.web3j.protocol.core.methods.response.EthEstimateGas;
 import org.web3j.protocol.core.methods.response.EthFilter;
 import org.web3j.protocol.core.methods.response.EthGasPrice;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
+import org.web3j.protocol.core.methods.response.EthGetBlockReceipts;
 import org.web3j.protocol.core.methods.response.EthGetBlockTransactionCountByHash;
 import org.web3j.protocol.core.methods.response.EthGetBlockTransactionCountByNumber;
 import org.web3j.protocol.core.methods.response.EthGetCode;
 import org.web3j.protocol.core.methods.response.EthGetCompilers;
+import org.web3j.protocol.core.methods.response.EthGetProof;
 import org.web3j.protocol.core.methods.response.EthGetStorageAt;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
@@ -91,10 +95,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Core Protocol Response tests. */
-public class ResponseTest extends ResponseTester {
+class ResponseTest extends ResponseTester {
 
     @Test
-    public void testErrorResponse() {
+    void testErrorResponse() {
         buildResponse(
                 "{"
                         + "  \"jsonrpc\":\"2.0\","
@@ -114,7 +118,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testErrorResponseComplexData() {
+    void testErrorResponseComplexData() {
         buildResponse(
                 "{"
                         + "  \"jsonrpc\":\"2.0\","
@@ -132,7 +136,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testWeb3ClientVersion() {
+    void testWeb3ClientVersion() {
         buildResponse(
                 "{\n"
                         + "  \"id\":67,\n"
@@ -145,7 +149,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testWeb3Sha3() throws IOException {
+    void testWeb3Sha3() throws IOException {
         buildResponse(
                 "{\n"
                         + "  \"id\":64,\n"
@@ -161,7 +165,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testNetVersion() throws IOException {
+    void testNetVersion() throws IOException {
         buildResponse(
                 "{\n"
                         + "  \"id\":67,\n"
@@ -174,7 +178,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testNetListening() throws IOException {
+    void testNetListening() throws IOException {
         buildResponse(
                 "{\n"
                         + "  \"id\":67,\n"
@@ -187,7 +191,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testNetPeerCount() throws IOException {
+    void testNetPeerCount() throws IOException {
         buildResponse(
                 "{\n"
                         + "  \"id\":74,\n"
@@ -200,7 +204,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testAdminNodeInfo() throws Exception {
+    void testAdminNodeInfo() throws Exception {
         buildResponse(
                 "{\n"
                         + "    \"jsonrpc\": \"2.0\",\n"
@@ -252,7 +256,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthProtocolVersion() throws IOException {
+    void testEthProtocolVersion() throws IOException {
         buildResponse(
                 "{\n"
                         + "  \"id\":67,\n"
@@ -265,7 +269,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthSyncingInProgress() {
+    void testEthSyncingInProgress() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -290,7 +294,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthSyncing() {
+    void testEthSyncing() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -303,7 +307,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthMining() {
+    void testEthMining() {
         buildResponse(
                 "{\n"
                         + "  \"id\":71,\n"
@@ -316,7 +320,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthHashrate() {
+    void testEthHashrate() {
         buildResponse(
                 "{\n"
                         + "  \"id\":71,\n"
@@ -329,7 +333,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthGasPrice() {
+    void testEthGasPrice() {
         buildResponse(
                 "{\n"
                         + "  \"id\":73,\n"
@@ -342,7 +346,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthAccounts() {
+    void testEthAccounts() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -357,7 +361,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthBlockNumber() {
+    void testEthBlockNumber() {
         buildResponse(
                 "{\n"
                         + "  \"id\":83,\n"
@@ -370,7 +374,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthGetBalance() {
+    void testEthGetBalance() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -383,7 +387,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthStorageAt() {
+    void testEthStorageAt() {
         buildResponse(
                 "{\n"
                         + "    \"jsonrpc\":\"2.0\","
@@ -399,7 +403,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthGetTransactionCount() {
+    void testEthGetTransactionCount() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -413,7 +417,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthGetBlockTransactionCountByHash() {
+    void testEthGetBlockTransactionCountByHash() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -428,7 +432,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthGetBlockTransactionCountByNumber() {
+    void testEthGetBlockTransactionCountByNumber() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -444,7 +448,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthGetUncleCountByBlockHash() {
+    void testEthGetUncleCountByBlockHash() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -458,7 +462,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthGetUncleCountByBlockNumber() {
+    void testEthGetUncleCountByBlockNumber() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -472,7 +476,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testGetCode() {
+    void testGetCode() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -489,7 +493,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthSign() {
+    void testEthSign() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -507,7 +511,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthSendTransaction() {
+    void testEthSendTransaction() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -523,7 +527,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthSendRawTransaction() {
+    void testEthSendRawTransaction() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -540,7 +544,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthCall() {
+    void testEthCall() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -555,7 +559,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthCallReverted() {
+    void testEthCallReverted() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -586,7 +590,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthEstimateGas() {
+    void testEthEstimateGas() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -599,7 +603,20 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthBlockTransactionHashes() {
+    void testEthBaseFee() {
+        buildResponse(
+                "{\n"
+                        + "  \"id\":1,\n"
+                        + "  \"jsonrpc\": \"2.0\",\n"
+                        + "  \"result\": \"0x5d21dba00\"\n"
+                        + "}");
+
+        EthBaseFee ethBaseFee = deserialiseResponse(EthBaseFee.class);
+        assertEquals(ethBaseFee.getBaseFee(), (BigInteger.valueOf(25000000000L)));
+    }
+
+    @Test
+    void testEthBlockTransactionHashes() {
 
         buildResponse(
                 "{\n"
@@ -609,6 +626,7 @@ public class ResponseTest extends ResponseTester {
                         + "    \"number\": \"0x1b4\",\n"
                         + "    \"hash\": \"0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331\",\n"
                         + "    \"parentHash\": \"0x9646252be9520f6e71339a8df9c55e4d7619deeb018d2a3f2d21fc165dde5eb5\",\n"
+                        + "    \"parentBeaconBlockRoot\": \"0x87996eeac031318cd38ee5de92b630676da7263b697a93ff55d0ad88c142e169\",\n"
                         + "    \"nonce\": \"0xe04d296d2460cfb8472af2c5fd05b5a214109c25688d3704aed5484f9a7792f2\",\n"
                         + "    \"sha3Uncles\": \"0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347\",\n"
                         + "    \"logsBloom\": \"0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331\",\n"
@@ -637,7 +655,18 @@ public class ResponseTest extends ResponseTester {
                         + "       \"0x57919c4e72e79ad7705a26e7ecd5a08ff546ac4fa37882e9cc57be87a3dab26b\",\n"
                         + "       \"0x39a3eb432fbef1fc\"\n"
                         + "    ],\n"
-                        + "    \"baseFeePerGas\": \"0x7\"\n"
+                        + "    \"baseFeePerGas\": \"0x7\",\n"
+                        + "    \"withdrawalsRoot\": \"0x1b1f845cd61c375a89ef101fd1bd86355f372a6a3dfe1960f2355e70bd5cd8a2\",\n"
+                        + "    \"withdrawals\": [\n"
+                        + "      {\n"
+                        + "        \"index\": \"0x68ba80\",\n"
+                        + "        \"validatorIndex\": \"0x65285\",\n"
+                        + "        \"address\": \"0x1e09b4199780a45792f4ff195ef68410a091b047\",\n"
+                        + "        \"amount\": \"0xd1f129\"\n"
+                        + "      }\n"
+                        + "    ],\n"
+                        + "    \"blobGasUsed\": \"0xa0000\",\n"
+                        + "    \"excessBlobGas\": \"0x4bc0000\"\n"
                         + "  }\n"
                         + "}");
 
@@ -647,6 +676,7 @@ public class ResponseTest extends ResponseTester {
                         "0x1b4",
                         "0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331",
                         "0x9646252be9520f6e71339a8df9c55e4d7619deeb018d2a3f2d21fc165dde5eb5",
+                        "0x87996eeac031318cd38ee5de92b630676da7263b697a93ff55d0ad88c142e169",
                         "0xe04d296d2460cfb8472af2c5fd05b5a214109c25688d3704aed5484f9a7792f2",
                         "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
                         "0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331",
@@ -675,12 +705,21 @@ public class ResponseTest extends ResponseTester {
                         Arrays.asList(
                                 "0x57919c4e72e79ad7705a26e7ecd5a08ff546ac4fa37882e9cc57be87a3dab26b",
                                 "0x39a3eb432fbef1fc"),
-                        "0x7");
+                        "0x7",
+                        "0x1b1f845cd61c375a89ef101fd1bd86355f372a6a3dfe1960f2355e70bd5cd8a2",
+                        Arrays.asList(
+                                new EthBlock.Withdrawal(
+                                        "0x68ba80",
+                                        "0x65285",
+                                        "0x1e09b4199780a45792f4ff195ef68410a091b047",
+                                        "0xd1f129")),
+                        "0xa0000",
+                        "0x4bc0000");
         assertEquals(ethBlock.getBlock(), (block));
     }
 
     @Test
-    public void testEthBlockFullTransactionsParity() {
+    void testEthBlockFullTransactionsWithoutBlob() {
 
         buildResponse(
                 "{\n"
@@ -743,7 +782,16 @@ public class ResponseTest extends ResponseTester {
                         + "       \"0x57919c4e72e79ad7705a26e7ecd5a08ff546ac4fa37882e9cc57be87a3dab26b\",\n"
                         + "       \"0x39a3eb432fbef1fc\"\n"
                         + "    ],\n"
-                        + "    \"baseFeePerGas\": \"0x7\"\n"
+                        + "    \"baseFeePerGas\": \"0x7\",\n"
+                        + "    \"withdrawalsRoot\": \"0x1b1f845cd61c375a89ef101fd1bd86355f372a6a3dfe1960f2355e70bd5cd8a2\",\n"
+                        + "    \"withdrawals\": [\n"
+                        + "      {\n"
+                        + "        \"index\": \"0x68ba80\",\n"
+                        + "        \"validatorIndex\": \"0x65285\",\n"
+                        + "        \"address\": \"0x1e09b4199780a45792f4ff195ef68410a091b047\",\n"
+                        + "        \"amount\": \"0xd1f129\"\n"
+                        + "      }\n"
+                        + "    ]\n"
                         + "  }\n"
                         + "}");
 
@@ -803,14 +851,20 @@ public class ResponseTest extends ResponseTester {
                         Arrays.asList(
                                 "0x57919c4e72e79ad7705a26e7ecd5a08ff546ac4fa37882e9cc57be87a3dab26b",
                                 "0x39a3eb432fbef1fc"),
-                        "0x7");
+                        "0x7",
+                        "0x1b1f845cd61c375a89ef101fd1bd86355f372a6a3dfe1960f2355e70bd5cd8a2",
+                        Arrays.asList(
+                                new EthBlock.Withdrawal(
+                                        "0x68ba80",
+                                        "0x65285",
+                                        "0x1e09b4199780a45792f4ff195ef68410a091b047",
+                                        "0xd1f129")));
 
         assertEquals(ethBlock.getBlock(), (block));
     }
 
-    // Remove once Geth & Parity return the same v value in transactions
     @Test
-    public void testEthBlockFullTransactionsGeth() {
+    void testEthBlockFullTransactionsWithBlob() {
 
         buildResponse(
                 "{\n"
@@ -820,6 +874,7 @@ public class ResponseTest extends ResponseTester {
                         + "    \"number\": \"0x1b4\",\n"
                         + "    \"hash\": \"0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331\",\n"
                         + "    \"parentHash\": \"0x9646252be9520f6e71339a8df9c55e4d7619deeb018d2a3f2d21fc165dde5eb5\",\n"
+                        + "    \"parentBeaconBlockRoot\": \"0x87996eeac031318cd38ee5de92b630676da7263b697a93ff55d0ad88c142e169\",\n"
                         + "    \"nonce\": \"0xe04d296d2460cfb8472af2c5fd05b5a214109c25688d3704aed5484f9a7792f2\",\n"
                         + "    \"sha3Uncles\": \"0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347\",\n"
                         + "    \"logsBloom\": \"0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331\",\n"
@@ -841,6 +896,7 @@ public class ResponseTest extends ResponseTester {
                         + "        \"nonce\":\"0x\",\n"
                         + "        \"blockHash\": \"0xbeab0aa2411b7ab17f30a99d3cb9c6ef2fc5426d6ad6fd9e2a26a6aed1d1055b\",\n"
                         + "        \"blockNumber\": \"0x15df\",\n"
+                        + "        \"chainId\": \"0x7f110\",\n"
                         + "        \"transactionIndex\":  \"0x1\",\n"
                         + "        \"from\":\"0x407d73d8a49eeb85d32cf465507dd71d507100c1\",\n"
                         + "        \"to\":\"0x85h43d8a49eeb85d32cf465507dd71d507100c1\",\n"
@@ -854,6 +910,7 @@ public class ResponseTest extends ResponseTester {
                         + "        \"r\":\"0xf115cc4d7516dd430046504e1c888198e0323e8ded016d755f89c226ba3481dc\",\n"
                         + "        \"s\":\"0x4a2ae8ee49f1100b5c0202b37ed8bacf4caeddebde6b7f77e12e7a55893e9f62\",\n"
                         + "        \"v\":\"0\",\n"
+                        + "        \"yParity\": \"0x0\",\n"
                         + "    \"accessList\": [{"
                         + "        \"address\":\"0x408e41876cccdc0f92210600ef50372656052a38\",\n"
                         + "    \"storageKeys\": ["
@@ -863,7 +920,9 @@ public class ResponseTest extends ResponseTester {
                         + "    }], \n"
                         + "        \"type\":\"0x0\",\n"
                         + "        \"maxFeePerGas\": \"0x7f110\",\n"
-                        + "        \"maxPriorityFeePerGas\": \"0x7f110\"\n"
+                        + "        \"maxPriorityFeePerGas\": \"0x7f110\",\n"
+                        + "        \"maxFeePerBlobGas\": \"0x7f110\",\n"
+                        + "        \"blobVersionedHashes\": [\"0x013343644e9aaa7e8673ba3be38b56bb3dfaa57db923797247e5f2e504b721c3\", \"0x01cad19a7fe88d9e14575394847a4a0026fccf292c4ca30ef047e6d03d3a74bb\"]"
                         + "    }], \n"
                         + "    \"uncles\": [\n"
                         + "       \"0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347\",\n"
@@ -873,7 +932,18 @@ public class ResponseTest extends ResponseTester {
                         + "       \"0x57919c4e72e79ad7705a26e7ecd5a08ff546ac4fa37882e9cc57be87a3dab26b\",\n"
                         + "       \"0x39a3eb432fbef1fc\"\n"
                         + "    ],\n"
-                        + "    \"baseFeePerGas\": \"0x7\"\n"
+                        + "    \"baseFeePerGas\": \"0x7\",\n"
+                        + "    \"withdrawalsRoot\": \"0x1b1f845cd61c375a89ef101fd1bd86355f372a6a3dfe1960f2355e70bd5cd8a2\",\n"
+                        + "    \"withdrawals\": [\n"
+                        + "      {\n"
+                        + "        \"index\": \"0x68ba80\",\n"
+                        + "        \"validatorIndex\": \"0x65285\",\n"
+                        + "        \"address\": \"0x1e09b4199780a45792f4ff195ef68410a091b047\",\n"
+                        + "        \"amount\": \"0xd1f129\"\n"
+                        + "      }\n"
+                        + "    ],\n"
+                        + "    \"blobGasUsed\": \"0xa0000\",\n"
+                        + "    \"excessBlobGas\": \"0x4bc0000\"\n"
                         + "  }\n"
                         + "}");
 
@@ -883,6 +953,7 @@ public class ResponseTest extends ResponseTester {
                         "0x1b4",
                         "0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331",
                         "0x9646252be9520f6e71339a8df9c55e4d7619deeb018d2a3f2d21fc165dde5eb5",
+                        "0x87996eeac031318cd38ee5de92b630676da7263b697a93ff55d0ad88c142e169",
                         "0xe04d296d2460cfb8472af2c5fd05b5a214109c25688d3704aed5484f9a7792f2",
                         "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
                         "0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331",
@@ -905,6 +976,7 @@ public class ResponseTest extends ResponseTester {
                                         "0x",
                                         "0xbeab0aa2411b7ab17f30a99d3cb9c6ef2fc5426d6ad6fd9e2a26a6aed1d1055b",
                                         "0x15df",
+                                        "0x7f110",
                                         "0x1",
                                         "0x407d73d8a49eeb85d32cf465507dd71d507100c1",
                                         "0x85h43d8a49eeb85d32cf465507dd71d507100c1",
@@ -919,6 +991,7 @@ public class ResponseTest extends ResponseTester {
                                         "0x4a2ae8ee49f1100b5c0202b37ed8bacf4caeddebde6b7f77e12e7a55893e9f62",
                                         0,
                                         "0x0",
+                                        "0x0",
                                         "0x7f110",
                                         "0x7f110",
                                         Arrays.asList(
@@ -926,28 +999,42 @@ public class ResponseTest extends ResponseTester {
                                                         "0x408e41876cccdc0f92210600ef50372656052a38",
                                                         Arrays.asList(
                                                                 "0x18919546fd5421b0ef1b1b8dfce80500e69f2e28ae34c4d6298172949fa77dcc",
-                                                                "0x4869ff95a61ee1ded0b22e2d0e3f54f3199886a9f361e634132c95164bfc5129"))))),
+                                                                "0x4869ff95a61ee1ded0b22e2d0e3f54f3199886a9f361e634132c95164bfc5129"))),
+                                        "0x7f110",
+                                        List.of(
+                                                "0x013343644e9aaa7e8673ba3be38b56bb3dfaa57db923797247e5f2e504b721c3",
+                                                "0x01cad19a7fe88d9e14575394847a4a0026fccf292c4ca30ef047e6d03d3a74bb"))),
                         Arrays.asList(
                                 "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
                                 "0xd5855eb08b3387c0af375e9cdb6acfc05eb8f519e419b874b6ff2ffda7ed1dff"),
                         Arrays.asList(
                                 "0x57919c4e72e79ad7705a26e7ecd5a08ff546ac4fa37882e9cc57be87a3dab26b",
                                 "0x39a3eb432fbef1fc"),
-                        "0x7");
+                        "0x7",
+                        "0x1b1f845cd61c375a89ef101fd1bd86355f372a6a3dfe1960f2355e70bd5cd8a2",
+                        Arrays.asList(
+                                new EthBlock.Withdrawal(
+                                        "0x68ba80",
+                                        "0x65285",
+                                        "0x1e09b4199780a45792f4ff195ef68410a091b047",
+                                        "0xd1f129")),
+                        "0xa0000",
+                        "0x4bc0000");
 
         assertEquals(ethBlock.getBlock(), (block));
     }
 
     @Test
-    public void testEthBlockNull() {
+    void testEthBlockNull() {
         buildResponse("{\n" + "  \"result\": null\n" + "}");
 
         EthBlock ethBlock = deserialiseResponse(EthBlock.class);
         assertNull(ethBlock.getBlock());
     }
+
     //
     @Test
-    public void testEthTransaction() {
+    void testEthTransaction() {
 
         buildResponse(
                 "{\n"
@@ -1017,21 +1104,94 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testTransactionChainId() {
+    void testEthTransactionResponseWithYParity() {
+        buildResponse(
+                "{\n"
+                        + "    \"id\":1,\n"
+                        + "    \"jsonrpc\":\"2.0\",\n"
+                        + "    \"result\": {\n"
+                        + "        \"hash\":\"0xc6ef2fc5426d6ad6fd9e2a26abeab0aa2411b7ab17f30a99d3cb96aed1d1055b\",\n"
+                        + "        \"nonce\":\"0x\",\n"
+                        + "        \"blockHash\": \"0xbeab0aa2411b7ab17f30a99d3cb9c6ef2fc5426d6ad6fd9e2a26a6aed1d1055b\",\n"
+                        + "        \"blockNumber\": \"0x15df\",\n"
+                        + "        \"chainId\": \"4\",\n"
+                        + "        \"transactionIndex\":  \"0x1\",\n"
+                        + "        \"from\":\"0x407d73d8a49eeb85d32cf465507dd71d507100c1\",\n"
+                        + "        \"to\":\"0x85h43d8a49eeb85d32cf465507dd71d507100c1\",\n"
+                        + "        \"value\":\"0x7f110\",\n"
+                        + "        \"gas\": \"0x7f110\",\n"
+                        + "        \"gasPrice\":\"0x09184e72a000\",\n"
+                        + "        \"input\":\"0x603880600c6000396000f300603880600c6000396000f3603880600c6000396000f360\",\n"
+                        + "        \"creates\":null,\n"
+                        + "        \"publicKey\":\"0x6614d7d7bfe989295821985de0439e868b26ff05f98ae0da0ce5bccc24ea368a083b785323c9fcb405dd4c10a2c95d93312a1b2d68beb24ab4ea7c3c2f7c455b\",\n"
+                        + "        \"raw\":\"0xf8cd83103a048504a817c800830e57e0945927c5cc723c4486f93bf90bad3be8831139499e80b864140f8dd300000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000c03905df347aa6490d5a98fbb8d8e49520000000000000000000000000000000000000000000000000000000057d56ee61ba0f115cc4d7516dd430046504e1c888198e0323e8ded016d755f89c226ba3481dca04a2ae8ee49f1100b5c0202b37ed8bacf4caeddebde6b7f77e12e7a55893e9f62\",\n"
+                        + "        \"r\":\"0xf115cc4d7516dd430046504e1c888198e0323e8ded016d755f89c226ba3481dc\",\n"
+                        + "        \"s\":\"0x4a2ae8ee49f1100b5c0202b37ed8bacf4caeddebde6b7f77e12e7a55893e9f62\",\n"
+                        + "        \"v\":\"0\",\n"
+                        + "        \"yParity\":\"1\",\n"
+                        + "    \"accessList\": [{"
+                        + "        \"address\":\"0x408e41876cccdc0f92210600ef50372656052a38\",\n"
+                        + "    \"storageKeys\": ["
+                        + "        \"0x18919546fd5421b0ef1b1b8dfce80500e69f2e28ae34c4d6298172949fa77dcc\",\n"
+                        + "        \"0x4869ff95a61ee1ded0b22e2d0e3f54f3199886a9f361e634132c95164bfc5129\"\n"
+                        + "    ] \n"
+                        + "    }], \n"
+                        + "        \"type\":\"0x0\",\n"
+                        + "        \"maxFeePerGas\": \"0x7f110\",\n"
+                        + "        \"maxPriorityFeePerGas\": \"0x7f110\"\n"
+                        + "  }\n"
+                        + "}");
+        Transaction transaction =
+                new Transaction(
+                        "0xc6ef2fc5426d6ad6fd9e2a26abeab0aa2411b7ab17f30a99d3cb96aed1d1055b",
+                        "0x",
+                        "0xbeab0aa2411b7ab17f30a99d3cb9c6ef2fc5426d6ad6fd9e2a26a6aed1d1055b",
+                        "0x15df",
+                        "4",
+                        "0x1",
+                        "0x407d73d8a49eeb85d32cf465507dd71d507100c1",
+                        "0x85h43d8a49eeb85d32cf465507dd71d507100c1",
+                        "0x7f110",
+                        "0x7f110",
+                        "0x09184e72a000",
+                        "0x603880600c6000396000f300603880600c6000396000f3603880600c6000396000f360",
+                        null,
+                        "0x6614d7d7bfe989295821985de0439e868b26ff05f98ae0da0ce5bccc24ea368a083b785323c9fcb405dd4c10a2c95d93312a1b2d68beb24ab4ea7c3c2f7c455b",
+                        "0xf8cd83103a048504a817c800830e57e0945927c5cc723c4486f93bf90bad3be8831139499e80b864140f8dd300000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000c03905df347aa6490d5a98fbb8d8e49520000000000000000000000000000000000000000000000000000000057d56ee61ba0f115cc4d7516dd430046504e1c888198e0323e8ded016d755f89c226ba3481dca04a2ae8ee49f1100b5c0202b37ed8bacf4caeddebde6b7f77e12e7a55893e9f62",
+                        "0xf115cc4d7516dd430046504e1c888198e0323e8ded016d755f89c226ba3481dc",
+                        "0x4a2ae8ee49f1100b5c0202b37ed8bacf4caeddebde6b7f77e12e7a55893e9f62",
+                        (byte) 0,
+                        "1",
+                        "0x0",
+                        "0x7f110",
+                        "0x7f110",
+                        Arrays.asList(
+                                new AccessListObject(
+                                        "0x408e41876cccdc0f92210600ef50372656052a38",
+                                        Arrays.asList(
+                                                "0x18919546fd5421b0ef1b1b8dfce80500e69f2e28ae34c4d6298172949fa77dcc",
+                                                "0x4869ff95a61ee1ded0b22e2d0e3f54f3199886a9f361e634132c95164bfc5129"))));
+
+        EthTransaction ethTransaction = deserialiseResponse(EthTransaction.class);
+        assertEquals(ethTransaction.getTransaction().get(), (transaction));
+    }
+
+    @Test
+    void testTransactionChainId() {
         Transaction transaction = new Transaction();
         transaction.setV(0x25);
         assertEquals(transaction.getChainId(), (1L));
     }
 
     @Test
-    public void testTransactionLongChainId() {
+    void testTransactionLongChainId() {
         Transaction transaction = new Transaction();
         transaction.setV(0x4A817C823L);
         assertEquals(transaction.getChainId(), (10000000000L));
     }
 
     @Test
-    public void testEthTransactionNull() {
+    void testEthTransactionNull() {
         buildResponse("{\n" + "  \"result\": null\n" + "}");
 
         EthTransaction ethTransaction = deserialiseResponse(EthTransaction.class);
@@ -1039,7 +1199,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testeEthGetTransactionReceiptBeforeByzantium() {
+    void testeEthGetTransactionReceiptBeforeByzantium() {
 
         buildResponse(
                 "{\n"
@@ -1111,7 +1271,115 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testeEthGetTransactionReceiptAfterByzantium() {
+    void testEthGetBlockReceipts() {
+        buildResponse(
+                "{\n"
+                        + "    \"jsonrpc\": \"2.0\",\n"
+                        + "    \"id\": 1,\n"
+                        + "    \"result\": [\n"
+                        + "        {\n"
+                        + "            \"blockHash\": \"0x8e38b4dbf6b11fcc3b9dee84fb7986e29ca0a02cecd8977c161ff7333329681e\",\n"
+                        + "            \"blockNumber\": \"0xf4240\",\n"
+                        + "            \"contractAddress\": null,\n"
+                        + "            \"cumulativeGasUsed\": \"0x723c\",\n"
+                        + "            \"effectiveGasPrice\": \"0x12bfb19e60\",\n"
+                        + "            \"from\": \"0x39fa8c5f2793459d6622857e7d9fbb4bd91766d3\",\n"
+                        + "            \"gasUsed\": \"0x723c\",\n"
+                        + "            \"logs\": [\n"
+                        + "                {\n"
+                        + "                    \"address\": \"0xc083e9947cf02b8ffc7d3090ae9aea72df98fd47\",\n"
+                        + "                    \"topics\": [\n"
+                        + "                        \"0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c\"\n"
+                        + "                    ],\n"
+                        + "                    \"data\": \"0x00000000000000000000000039fa8c5f2793459d6622857e7d9fbb4bd91766d30000000000000000000000000000000000000000000000056bc75e2d63100000\",\n"
+                        + "                    \"blockNumber\": \"0xf4240\",\n"
+                        + "                    \"transactionHash\": \"0xea1093d492a1dcb1bef708f771a99a96ff05dcab81ca76c31940300177fcf49f\",\n"
+                        + "                    \"transactionIndex\": \"0x0\",\n"
+                        + "                    \"blockHash\": \"0x8e38b4dbf6b11fcc3b9dee84fb7986e29ca0a02cecd8977c161ff7333329681e\",\n"
+                        + "                    \"logIndex\": \"0x0\",\n"
+                        + "                    \"removed\": false\n"
+                        + "                }\n"
+                        + "            ],\n"
+                        + "            \"logsBloom\": \"0x00000000000000000000000000000000000800000000000000000000000800000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000\",\n"
+                        + "            \"status\": \"0x1\",\n"
+                        + "            \"to\": \"0xc083e9947cf02b8ffc7d3090ae9aea72df98fd47\",\n"
+                        + "            \"transactionHash\": \"0xea1093d492a1dcb1bef708f771a99a96ff05dcab81ca76c31940300177fcf49f\",\n"
+                        + "            \"transactionIndex\": \"0x0\",\n"
+                        + "            \"type\": \"0x0\"\n"
+                        + "        },\n"
+                        + "        {\n"
+                        + "            \"blockHash\": \"0x8e38b4dbf6b11fcc3b9dee84fb7986e29ca0a02cecd8977c161ff7333329681e\",\n"
+                        + "            \"blockNumber\": \"0xf4240\",\n"
+                        + "            \"contractAddress\": null,\n"
+                        + "            \"cumulativeGasUsed\": \"0xc444\",\n"
+                        + "            \"effectiveGasPrice\": \"0xdf8475800\",\n"
+                        + "            \"from\": \"0x32be343b94f860124dc4fee278fdcbd38c102d88\",\n"
+                        + "            \"gasUsed\": \"0x5208\",\n"
+                        + "            \"logs\": [],\n"
+                        + "            \"logsBloom\": \"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\n"
+                        + "            \"status\": \"0x1\",\n"
+                        + "            \"to\": \"0xdf190dc7190dfba737d7777a163445b7fff16133\",\n"
+                        + "            \"transactionHash\": \"0xe9e91f1ee4b56c0df2e9f06c2b8c27c6076195a88a7b8537ba8313d80e6f124e\",\n"
+                        + "            \"transactionIndex\": \"0x1\",\n"
+                        + "            \"type\": \"0x0\"\n"
+                        + "        }\n"
+                        + "    ]\n"
+                        + "}");
+        List<TransactionReceipt> transactionReceipts =
+                Arrays.asList(
+                        new TransactionReceipt(
+                                "0xea1093d492a1dcb1bef708f771a99a96ff05dcab81ca76c31940300177fcf49f",
+                                "0x0",
+                                "0x8e38b4dbf6b11fcc3b9dee84fb7986e29ca0a02cecd8977c161ff7333329681e",
+                                "0xf4240",
+                                "0x723c",
+                                "0x723c",
+                                null,
+                                null,
+                                "0x1",
+                                "0x39fa8c5f2793459d6622857e7d9fbb4bd91766d3",
+                                "0xc083e9947cf02b8ffc7d3090ae9aea72df98fd47",
+                                Arrays.asList(
+                                        new Log(
+                                                false,
+                                                "0x0",
+                                                "0x0",
+                                                "0xea1093d492a1dcb1bef708f771a99a96ff05dcab81ca76c31940300177fcf49f",
+                                                "0x8e38b4dbf6b11fcc3b9dee84fb7986e29ca0a02cecd8977c161ff7333329681e",
+                                                "0xf4240",
+                                                "0xc083e9947cf02b8ffc7d3090ae9aea72df98fd47",
+                                                "0x00000000000000000000000039fa8c5f2793459d6622857e7d9fbb4bd91766d30000000000000000000000000000000000000000000000056bc75e2d63100000",
+                                                null,
+                                                Arrays.asList(
+                                                        "0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c"))),
+                                "0x00000000000000000000000000000000000800000000000000000000000800000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000",
+                                null,
+                                "0x0",
+                                "0x12bfb19e60"),
+                        new TransactionReceipt(
+                                "0xe9e91f1ee4b56c0df2e9f06c2b8c27c6076195a88a7b8537ba8313d80e6f124e",
+                                "0x1",
+                                "0x8e38b4dbf6b11fcc3b9dee84fb7986e29ca0a02cecd8977c161ff7333329681e",
+                                "0xf4240",
+                                "0xc444",
+                                "0x5208",
+                                null,
+                                null,
+                                "0x1",
+                                "0x32be343b94f860124dc4fee278fdcbd38c102d88",
+                                "0xdf190dc7190dfba737d7777a163445b7fff16133",
+                                Arrays.asList(),
+                                "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                                null,
+                                "0x0",
+                                "0xdf8475800"));
+        EthGetBlockReceipts ethGetBlockReceipts = deserialiseResponse(EthGetBlockReceipts.class);
+
+        assertEquals(ethGetBlockReceipts.getBlockReceipts().get(), (transactionReceipts));
+    }
+
+    @Test
+    void testeEthGetTransactionReceiptAfterByzantium() {
 
         buildResponse(
                 "{\n"
@@ -1183,7 +1451,83 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testTransactionReceiptIsStatusOK() {
+    void testeEthGetTransactionReceiptAfterEIP4844() {
+
+        buildResponse(
+                "{\n"
+                        + "    \"id\":1,\n"
+                        + "    \"jsonrpc\":\"2.0\",\n"
+                        + "    \"result\": {\n"
+                        + "        \"transactionHash\": \"0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238\",\n"
+                        + "        \"transactionIndex\":  \"0x1\",\n"
+                        + "        \"blockHash\": \"0xc6ef2fc5426d6ad6fd9e2a26abeab0aa2411b7ab17f30a99d3cb96aed1d1055b\",\n"
+                        + "        \"blockNumber\": \"0xb\",\n"
+                        + "        \"cumulativeGasUsed\": \"0x33bc\",\n"
+                        + "        \"effectiveGasPrice\": null,\n"
+                        + "        \"type\": null,\n"
+                        + "        \"gasUsed\": \"0x4dc\",\n"
+                        + "        \"contractAddress\": \"0xb60e8dd61c5d32be8058bb8eb970870f07233155\",\n"
+                        + "        \"status\": \"0x1\",\n"
+                        + "        \"from\":\"0x407d73d8a49eeb85d32cf465507dd71d507100c1\",\n"
+                        + "        \"to\":\"0x85h43d8a49eeb85d32cf465507dd71d507100c1\",\n"
+                        + "        \"logs\": [{\n"
+                        + "            \"removed\": false,\n"
+                        + "            \"logIndex\": \"0x1\",\n"
+                        + "            \"transactionIndex\": \"0x0\",\n"
+                        + "            \"transactionHash\": \"0xdf829c5a142f1fccd7d8216c5785ac562ff41e2dcfdf5785ac562ff41e2dcf\",\n"
+                        + "            \"blockHash\": \"0x8216c5785ac562ff41e2dcfdf5785ac562ff41e2dcfdf829c5a142f1fccd7d\",\n"
+                        + "            \"blockNumber\":\"0x1b4\",\n"
+                        + "            \"address\": \"0x16c5785ac562ff41e2dcfdf829c5a142f1fccd7d\",\n"
+                        + "            \"data\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\n"
+                        + "            \"type\":\"mined\",\n"
+                        + "            \"topics\": [\"0x59ebeb90bc63057b6515673c3ecf9438e5058bca0f92585014eced636878c9a5\"]"
+                        + "        }],\n"
+                        + "        \"logsBloom\":\"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\n"
+                        + "        \"blobGasPrice\": \"0x1abcd\",\n"
+                        + "        \"blobGasUsed\": \"0x2dcba\"\n"
+                        + "  }\n"
+                        + "}");
+
+        TransactionReceipt transactionReceipt =
+                new TransactionReceipt(
+                        "0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238",
+                        "0x1",
+                        "0xc6ef2fc5426d6ad6fd9e2a26abeab0aa2411b7ab17f30a99d3cb96aed1d1055b",
+                        "0xb",
+                        "0x33bc",
+                        "0x4dc",
+                        "0xb60e8dd61c5d32be8058bb8eb970870f07233155",
+                        null,
+                        "0x1",
+                        "0x407d73d8a49eeb85d32cf465507dd71d507100c1",
+                        "0x85h43d8a49eeb85d32cf465507dd71d507100c1",
+                        Arrays.asList(
+                                new Log(
+                                        false,
+                                        "0x1",
+                                        "0x0",
+                                        "0xdf829c5a142f1fccd7d8216c5785ac562ff41e2dcfdf5785ac562ff41e2dcf",
+                                        "0x8216c5785ac562ff41e2dcfdf5785ac562ff41e2dcfdf829c5a142f1fccd7d",
+                                        "0x1b4",
+                                        "0x16c5785ac562ff41e2dcfdf829c5a142f1fccd7d",
+                                        "0x0000000000000000000000000000000000000000000000000000000000000000",
+                                        "mined",
+                                        Arrays.asList(
+                                                "0x59ebeb90bc63057b6515673c3ecf9438e5058bca0f92585014eced636878c9a5"))),
+                        "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                        null,
+                        null,
+                        null,
+                        "0x1abcd",
+                        "0x2dcba");
+
+        EthGetTransactionReceipt ethGetTransactionReceipt =
+                deserialiseResponse(EthGetTransactionReceipt.class);
+        assertEquals(ethGetTransactionReceipt.getTransactionReceipt().get(), (transactionReceipt));
+    }
+
+    @Test
+    void testTransactionReceiptIsStatusOK() {
         TransactionReceipt transactionReceipt = new TransactionReceipt();
         transactionReceipt.setStatus("0x1");
         assertEquals(transactionReceipt.isStatusOK(), (true));
@@ -1197,7 +1541,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthGetCompilers() {
+    void testEthGetCompilers() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1210,7 +1554,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthCompileSolidity() {
+    void testEthCompileSolidity() {
 
         buildResponse(
                 "{\n"
@@ -1290,7 +1634,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthCompileLLL() {
+    void testEthCompileLLL() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1308,7 +1652,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthCompileSerpent() {
+    void testEthCompileSerpent() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1326,7 +1670,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthFilter() {
+    void testEthFilter() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1339,7 +1683,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthUninstallFilter() {
+    void testEthUninstallFilter() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1352,7 +1696,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthLog() {
+    void testEthLog() {
 
         buildResponse(
                 "{\n"
@@ -1392,7 +1736,63 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthGetWork() {
+    void testEthGetProof() {
+        buildResponse(
+                "{\n"
+                        + "  \"jsonrpc\": \"2.0\",\n"
+                        + "  \"id\": 1,\n"
+                        + "  \"result\": {\n"
+                        + "    \"address\": \"0x7f0d15c7faae65896648c8273b6d7e43f58fa842\",\n"
+                        + "    \"accountProof\": [\n"
+                        + "      \"0xf90211a08245f766623948f962b9f277955e4be3868d107042195746e5bb9b60e45c4a35a0f95891987a66390224caca18cf15d40288e85a58fee02b61b4e235a95844678ca04c783e1622a91a7cd4d06e82e654cc8bcd5b00a545889ff729f35ccd8387f5e3a08e28b463ee2ada55e1647c4c502976e5c09dcd94828e78d0ad09ab94db80a14aa0a41aaedbede9a14677796971bbe97ac152c4101471d62786208cf54bb7763818a02bc95a8f57339e1262460c02e885ab2fc03762a7a646693b659e64889522ca3aa075772fb16c66643216c7ab93eb2c96d28142b8c99573f4fcdce41b9064a303d1a0da840a0f8f62bf404e1241139fb6d6eedf56e5ea7fed9e79001bbc31806d7168a0550099050860af73557452539c5bd055324400969f76b4643b531a8fef7c4ad2a02de16af6ab3f4205295bdd828e81c97930413ee3dd8e0aa76268909492c0f646a0ab2f8ba58a07310e12c7140427278f5715cbf975b735bac5d2338c487b2b615ca004725301c50e47bfa03c8495b5f009ee5aac8b15581dc6e9f5870c63e8fcc118a0cbd9efe9133d519ca35327c90c3b102972967e35e4432e4d0ce8416311267b7ca04e8d4cd1b3d110571ed885ccd470458a86e2dcf1fd083f1c2b9118001d4fc89ea03c6135b75f89e3b5c24c1354638e1a10c2248e5d7bc87df2d8230910660d3d84a0186eea2111408bc02272677443c21e2533146a56785a6bc34f9180e2ba4b567880\",\n"
+                        + "      \"0xf90211a0ebfa45ac468954fd9f1e4d5c8b5b0015500b7e9f083e1626e05a03069d2d7b67a077e18486d90836a1816056a6fa8ed0339e15cf937ea87841e035ab26fd39057ea06e8c3b073ed5d7e86a205f0011f726b0a87f011b4e6e0521a287d378eda627a5a0b1decdb542bf89924e1022d9ab05e3dd9e2aca2f32f43489ce5723ddbe8b7a4fa0223dd0aa6c255a7b5a1e4b9753eacf599db92476baf674136f39b808d084991da0cbd89f24d151b9b23b147bf1bb71006d8661b19a8171cf26bb20842944a25ff1a0a380efa4b380cf41b0af35bb7a4f68c1a3988f9aa62c1a4c3c0bfd72d6c588c2a0c76f535a14cd7d869f5f01054cc72b827bd1c7b11df30138b98421a7c331d5a8a0d5b25d3d8a6c82f60c6eab724afed222f575824789d2d9f0768d46be39b7cbd1a0e2b2326a7ee7c454bde59d682367af495756b3c11408b7d97e3e84936ef4c5a1a00bb7e8a57023a0926c6683cd2a9a530b29d26d75d38872aeec1a21100b77fecba0288d0834990caaf30d2c6dfff07e52615e16c463e7256fab04ede25899d032f9a0dbb8748605aeb933068490238594afa7d93e018d04712d3d6af29fac9c81620fa0bae1aa9abe2c40e45f3274edeaba95f81a7e91da98c746bf31b21c280f100682a0c726027419c64dba7e2aeb5d1423b1fad6e773cb604668dc044671d5d5b18430a0cacd3a2b6c933e9a2148c7314d294d2f7356bb17900ac3b4faccd7f561cd6f1d80\",\n"
+                        + "      \"0xf90211a0d26a9a18bdeb7e2387f9d9375bbc1b987c45a58f3eaaa4d29df611f0618c17d4a0839e8f34f581129bf52277d6aab412bc9794866fa22e93938fffbf85896b067ba008d315b1fbb99070a424b7efdeb3a8a90d631e325dc48f5f8c36b67ca0244081a0c1436f0a1e74a33600455326571d9549e904724d2646c0c86bed0e226a687bd1a05699909cad5f4b507001ce88a887af4148fb7ee14ed0f93c7aa9635b66407f9da0cb5f6eb1cc89cef0e221aeef566c891fa46f456370d52a8b322e4917c2f9ad87a0da1425f08bbf9d0368d159cd810f33c2b19a6e5d0b15043dfac565cf03b57c77a0b26393ad5305e312a3e388deb50bec841bbcbec45317ffb7753114f3d6d37ff9a0c24f396b4ae01cb32a72880baff2db25843979103c3a4d1116698416e29439c4a0d6738cafb3d29dd438a2bf074d9b991636535b83b41f589189801ce75e94c5b7a02f2c355b91c78a6d5386a874a092b1d8e1c740408afb532721c1af0e905de5e3a01511013c45279c74536a5e538251c4dfd7594848ed570b48615b094ca83849dda05e12cb9b86dc6c2c1e0dd68f8c2a93c83d2eedb5dbba3969a2b6c7032e26fc7ca0cfa01a6943b11ca2be19dfa3b23d535395f17db6ac1fe1dd5172643e8ccd68f7a002ae61b52a9a0b09c4ca9866b69e4f10765c1f7778e2d4f2300183868f5fd151a039dc21a690fbeed9ea699959be8b2e76eed93b9da21d12ee4254d0a1c51dc87380\",\n"
+                        + "      \"0xf90211a05b44d7409dc085529b33905d01eb00210fb1c787998b88df5619fb6e3b860181a03bb3e5e3e8d979fd3bc86c602d6e6a57b1fc4c7f5f6a774b7e91af001cdef664a0a8fd61cceed0f8a639beca30fcd32411c0fcca5a102ff4a2656cde8c7eb858b4a0052e56ef09a9139a58d80329870ddc961e8ed112c8edc1325f71903fba84275ba0729ff34831623850f26d3601d7db1af2da69f115e9be8f9fa8454cc006b51403a09e56b2a68595be5b215cbc173a6e810137be55a748587eb81d172439018ee7aaa0fa5b27319522283b38e2d1abec5941b2d78e78fc40aa5a4b4476e36a0443311fa05b5f6d0058c46ea701f4ba42aabedb7b12e664a91f4b35c5519797df4c623f55a0947a7cbc568c23382aacbe508353c7f8ad299f3ea3eb471506c6b4291868b3e5a0f2313976f5c85685f419fc3022cf28fb9696c05ca27c44437f717f02e0154fbda01a96e6375ed8e8dc0749b2d45f93207d9219168a9eea142053a5e23e7a47232aa06f9d9145b92865e970f60dd81aa55ced05698090e9e23f341729be2a90ce7b96a01b6c084aad02ab8cfc5bdc0800b956db46853cfa8b9b47ff35867f02718f8130a0d7493eefde332cd1de8898096e9e8916cc7e320a6eb0ede2dc165fc5ed8803a1a0f0c6e212824552eee4b2479dae9b570041441e0cb0244d8bf045a73268aefda6a01e9045c2bc23b1610f20c3501862a067bfc80af7908344527c62faf1129fb43d80\",\n"
+                        + "      \"0xf90211a056e7736ac44b0a6d46f4a6e40abf6426866f7f29ab0637bc89c390b4f0dc7807a07aec46d6e64a9847c400021f5e0f0373592e676b11d15cdf22765addf1033f01a09c356f78e4889e626568761468ca4e44ce0cc78f08a40035fc9be23b1c1990a0a0d18cfe2360f9559b663f4a8864995420b54e0c4c6c7f33019d2467b67080fed5a08b3d08ef8de3638edabb423c901a6c1ca8b1ef93b41427b2d409be7198a89225a0df689118041c8f4b2751afbf3cb7be36540e52742362df3ded6f67e3a8024feea0a7e5e17854690d418ef89eb6753e1d36e96cadc4a186bcd8ce71f8665fbe6814a0367bc2399eee7dffeaf8aea140a3973cbced2ed904aa7e6c69443a4877bb7115a0b1f51cb2cb73acdce7ee790854c03d59940e415b6598bda7fa753c0ae0e129dda021f400618bbd2b1ac65d863146f3497feaca7e73df4a3cf211b0a95ec5f39b5ea0494ec6c1615466d244e80992aee4b2496b4c8adda7f7b989e776a715a7a72b4aa03d64c83151b47fdf8c16ce7845306575108c3b8c6b3f9ce8032b65f05fb5d017a0c68bc1b17e6a32dd438aec2ca6c8beea5dd53a3192971bbc484036c9431ead88a0580a8ef71765615a19afd214553866e2215f94eb72631335fa8ec0c5ad450e19a04eda5daea47af109418ad18cae8c124e790d66046ce9389376c4a965f919c725a0a0a6553d3fc52e639eac9c20dbb7cd8930eacaa8b35f8b8f3bb23afb53cc966580\",\n"
+                        + "      \"0xf90211a0597493b2845e511c876b84fad3925bb78c3922b3734208f20aff5461c7078e7ca0eb3723d662049847561ea31922b2ea5ab7a641ce7c14b5fa0ec346975d16c187a00e5c88ea26113f0295d8c682f1526f2fa7906bc422bfe9cc8b8f869686e179d4a0b94a30e2218afad53a0eacc505ea552a8288457847fcae72555aac638b52c46ea0d6430dd23ef9889e1272e494530d6ec89f080c49bf09f8a6ac634b153fa8ce5ca0e8c4de149f9b385e51fb66516a4d91b62dbd80ddedd4522e14d370da47f63e5aa0fa40fc95a8bdd7126c4db03b0c1a20c654aa22cf6f72024c4a0925d6f29fc9baa005c16a67b6ee21b8e9371064570b2f30342add57d7c45bc43df25fc680132186a0c2ed9529b58b672abd733db30ccac4e5ebeeedeb38418a5925e57b0f822df814a0d18e42474e815b62da57cf67bcd8ed1c90d4f8ecf8f6d0b2e66b9656be2686ada0e4dc3683f731f21c0c34a10d7ffac39b20a64ac326269433a5cacaeb90a8a17da0e3f8b04c275387c6222b6536967f2f1e6fc76dc6ee0e705d3e505f3d07e8bdd4a0deaf89533b13c20ff50ff3f03ff3a2daa8d1329a6a6d17a58c422cbe5ee2f80aa022b542269e108a24dc0ed74e62fc571185dcf398acfbf15a7fb6ce3e8aba50d6a0f29369f8c3d70bc9f472c2175ab5495edcf35a65527f67d391068c0275284307a0c93bd89abbea5ae96496a12d236323d11d2da9cde7a3b9fdb15d504f4ea1eda680\",\n"
+                        + "      \"0xf90151a000595129cf1c67ce97ed615df7184fb47a0d018d9147a2a7952a639e464cdfd380a052081f67d885b439bee62a1c4e09c02a1ec729aef4d92be6584a29141a79c5c7a0d99cae2bc3b6fc3e8e2767b4d7a5884b9b2d9d20da7890318beefcdb9c7346d58080a0f63571735d99e763dafadb03d1abe3a93a98740ecddc8514d13df46a35a8d94680a081870f4697e57436ccdd8bdc1d624d7bc07861748ff8b3a352334df68f2c03ada0f0252504ee8753335ecf0ca1f73cf13d4505783ed5110bf4e9b384a68ad88f69a0d38a18ef7b993c9ad2d848453e7722c26998ff3d63e243b99cdab0dabf84157ea06e5ad479dbda7f1647ed613e35d837f5d2c697ef34160f3665173186553ee9c280a0bf8371cac505b6ea0cb0f67ef744713f306a2455f3f8844cfa527c62db59c69980a0d6d689405b1cf73786c5fdabb55ec22f9b5712d1ba9c0bfcd46d4b93721fcac780\",\n"
+                        + "      \"0xf8669d37f29e142d49f8824d4e7f1735ec3da219687387629b5fccd86812df84b846f8440180a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a01d93f60f105899172f7255c030301c3af4564edd4a48577dbdc448aec7ddb0ac\"],\n"
+                        + "    \"balance\": \"0x0\",\n"
+                        + "    \"codeHash\": \"0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470\",\n"
+                        + "    \"nonce\": \"0x0\",\n"
+                        + "    \"storageHash\": \"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\",\n"
+                        + "    \"storageProof\": [{\n"
+                        + "      \"key\": \"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\",\n"
+                        + "      \"value\": \"0x0\",\n"
+                        + "      \"proof\": []\n"
+                        + "    }]\n"
+                        + "  }\n"
+                        + "}");
+
+        EthGetProof ethGetProof = deserialiseResponse(EthGetProof.class);
+
+        EthGetProof.Proof proof =
+                new EthGetProof.Proof(
+                        "0x7f0d15c7faae65896648c8273b6d7e43f58fa842",
+                        "0x0",
+                        "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+                        "0x0",
+                        "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+                        Arrays.asList(
+                                "0xf90211a08245f766623948f962b9f277955e4be3868d107042195746e5bb9b60e45c4a35a0f95891987a66390224caca18cf15d40288e85a58fee02b61b4e235a95844678ca04c783e1622a91a7cd4d06e82e654cc8bcd5b00a545889ff729f35ccd8387f5e3a08e28b463ee2ada55e1647c4c502976e5c09dcd94828e78d0ad09ab94db80a14aa0a41aaedbede9a14677796971bbe97ac152c4101471d62786208cf54bb7763818a02bc95a8f57339e1262460c02e885ab2fc03762a7a646693b659e64889522ca3aa075772fb16c66643216c7ab93eb2c96d28142b8c99573f4fcdce41b9064a303d1a0da840a0f8f62bf404e1241139fb6d6eedf56e5ea7fed9e79001bbc31806d7168a0550099050860af73557452539c5bd055324400969f76b4643b531a8fef7c4ad2a02de16af6ab3f4205295bdd828e81c97930413ee3dd8e0aa76268909492c0f646a0ab2f8ba58a07310e12c7140427278f5715cbf975b735bac5d2338c487b2b615ca004725301c50e47bfa03c8495b5f009ee5aac8b15581dc6e9f5870c63e8fcc118a0cbd9efe9133d519ca35327c90c3b102972967e35e4432e4d0ce8416311267b7ca04e8d4cd1b3d110571ed885ccd470458a86e2dcf1fd083f1c2b9118001d4fc89ea03c6135b75f89e3b5c24c1354638e1a10c2248e5d7bc87df2d8230910660d3d84a0186eea2111408bc02272677443c21e2533146a56785a6bc34f9180e2ba4b567880",
+                                "0xf90211a0ebfa45ac468954fd9f1e4d5c8b5b0015500b7e9f083e1626e05a03069d2d7b67a077e18486d90836a1816056a6fa8ed0339e15cf937ea87841e035ab26fd39057ea06e8c3b073ed5d7e86a205f0011f726b0a87f011b4e6e0521a287d378eda627a5a0b1decdb542bf89924e1022d9ab05e3dd9e2aca2f32f43489ce5723ddbe8b7a4fa0223dd0aa6c255a7b5a1e4b9753eacf599db92476baf674136f39b808d084991da0cbd89f24d151b9b23b147bf1bb71006d8661b19a8171cf26bb20842944a25ff1a0a380efa4b380cf41b0af35bb7a4f68c1a3988f9aa62c1a4c3c0bfd72d6c588c2a0c76f535a14cd7d869f5f01054cc72b827bd1c7b11df30138b98421a7c331d5a8a0d5b25d3d8a6c82f60c6eab724afed222f575824789d2d9f0768d46be39b7cbd1a0e2b2326a7ee7c454bde59d682367af495756b3c11408b7d97e3e84936ef4c5a1a00bb7e8a57023a0926c6683cd2a9a530b29d26d75d38872aeec1a21100b77fecba0288d0834990caaf30d2c6dfff07e52615e16c463e7256fab04ede25899d032f9a0dbb8748605aeb933068490238594afa7d93e018d04712d3d6af29fac9c81620fa0bae1aa9abe2c40e45f3274edeaba95f81a7e91da98c746bf31b21c280f100682a0c726027419c64dba7e2aeb5d1423b1fad6e773cb604668dc044671d5d5b18430a0cacd3a2b6c933e9a2148c7314d294d2f7356bb17900ac3b4faccd7f561cd6f1d80",
+                                "0xf90211a0d26a9a18bdeb7e2387f9d9375bbc1b987c45a58f3eaaa4d29df611f0618c17d4a0839e8f34f581129bf52277d6aab412bc9794866fa22e93938fffbf85896b067ba008d315b1fbb99070a424b7efdeb3a8a90d631e325dc48f5f8c36b67ca0244081a0c1436f0a1e74a33600455326571d9549e904724d2646c0c86bed0e226a687bd1a05699909cad5f4b507001ce88a887af4148fb7ee14ed0f93c7aa9635b66407f9da0cb5f6eb1cc89cef0e221aeef566c891fa46f456370d52a8b322e4917c2f9ad87a0da1425f08bbf9d0368d159cd810f33c2b19a6e5d0b15043dfac565cf03b57c77a0b26393ad5305e312a3e388deb50bec841bbcbec45317ffb7753114f3d6d37ff9a0c24f396b4ae01cb32a72880baff2db25843979103c3a4d1116698416e29439c4a0d6738cafb3d29dd438a2bf074d9b991636535b83b41f589189801ce75e94c5b7a02f2c355b91c78a6d5386a874a092b1d8e1c740408afb532721c1af0e905de5e3a01511013c45279c74536a5e538251c4dfd7594848ed570b48615b094ca83849dda05e12cb9b86dc6c2c1e0dd68f8c2a93c83d2eedb5dbba3969a2b6c7032e26fc7ca0cfa01a6943b11ca2be19dfa3b23d535395f17db6ac1fe1dd5172643e8ccd68f7a002ae61b52a9a0b09c4ca9866b69e4f10765c1f7778e2d4f2300183868f5fd151a039dc21a690fbeed9ea699959be8b2e76eed93b9da21d12ee4254d0a1c51dc87380",
+                                "0xf90211a05b44d7409dc085529b33905d01eb00210fb1c787998b88df5619fb6e3b860181a03bb3e5e3e8d979fd3bc86c602d6e6a57b1fc4c7f5f6a774b7e91af001cdef664a0a8fd61cceed0f8a639beca30fcd32411c0fcca5a102ff4a2656cde8c7eb858b4a0052e56ef09a9139a58d80329870ddc961e8ed112c8edc1325f71903fba84275ba0729ff34831623850f26d3601d7db1af2da69f115e9be8f9fa8454cc006b51403a09e56b2a68595be5b215cbc173a6e810137be55a748587eb81d172439018ee7aaa0fa5b27319522283b38e2d1abec5941b2d78e78fc40aa5a4b4476e36a0443311fa05b5f6d0058c46ea701f4ba42aabedb7b12e664a91f4b35c5519797df4c623f55a0947a7cbc568c23382aacbe508353c7f8ad299f3ea3eb471506c6b4291868b3e5a0f2313976f5c85685f419fc3022cf28fb9696c05ca27c44437f717f02e0154fbda01a96e6375ed8e8dc0749b2d45f93207d9219168a9eea142053a5e23e7a47232aa06f9d9145b92865e970f60dd81aa55ced05698090e9e23f341729be2a90ce7b96a01b6c084aad02ab8cfc5bdc0800b956db46853cfa8b9b47ff35867f02718f8130a0d7493eefde332cd1de8898096e9e8916cc7e320a6eb0ede2dc165fc5ed8803a1a0f0c6e212824552eee4b2479dae9b570041441e0cb0244d8bf045a73268aefda6a01e9045c2bc23b1610f20c3501862a067bfc80af7908344527c62faf1129fb43d80",
+                                "0xf90211a056e7736ac44b0a6d46f4a6e40abf6426866f7f29ab0637bc89c390b4f0dc7807a07aec46d6e64a9847c400021f5e0f0373592e676b11d15cdf22765addf1033f01a09c356f78e4889e626568761468ca4e44ce0cc78f08a40035fc9be23b1c1990a0a0d18cfe2360f9559b663f4a8864995420b54e0c4c6c7f33019d2467b67080fed5a08b3d08ef8de3638edabb423c901a6c1ca8b1ef93b41427b2d409be7198a89225a0df689118041c8f4b2751afbf3cb7be36540e52742362df3ded6f67e3a8024feea0a7e5e17854690d418ef89eb6753e1d36e96cadc4a186bcd8ce71f8665fbe6814a0367bc2399eee7dffeaf8aea140a3973cbced2ed904aa7e6c69443a4877bb7115a0b1f51cb2cb73acdce7ee790854c03d59940e415b6598bda7fa753c0ae0e129dda021f400618bbd2b1ac65d863146f3497feaca7e73df4a3cf211b0a95ec5f39b5ea0494ec6c1615466d244e80992aee4b2496b4c8adda7f7b989e776a715a7a72b4aa03d64c83151b47fdf8c16ce7845306575108c3b8c6b3f9ce8032b65f05fb5d017a0c68bc1b17e6a32dd438aec2ca6c8beea5dd53a3192971bbc484036c9431ead88a0580a8ef71765615a19afd214553866e2215f94eb72631335fa8ec0c5ad450e19a04eda5daea47af109418ad18cae8c124e790d66046ce9389376c4a965f919c725a0a0a6553d3fc52e639eac9c20dbb7cd8930eacaa8b35f8b8f3bb23afb53cc966580",
+                                "0xf90211a0597493b2845e511c876b84fad3925bb78c3922b3734208f20aff5461c7078e7ca0eb3723d662049847561ea31922b2ea5ab7a641ce7c14b5fa0ec346975d16c187a00e5c88ea26113f0295d8c682f1526f2fa7906bc422bfe9cc8b8f869686e179d4a0b94a30e2218afad53a0eacc505ea552a8288457847fcae72555aac638b52c46ea0d6430dd23ef9889e1272e494530d6ec89f080c49bf09f8a6ac634b153fa8ce5ca0e8c4de149f9b385e51fb66516a4d91b62dbd80ddedd4522e14d370da47f63e5aa0fa40fc95a8bdd7126c4db03b0c1a20c654aa22cf6f72024c4a0925d6f29fc9baa005c16a67b6ee21b8e9371064570b2f30342add57d7c45bc43df25fc680132186a0c2ed9529b58b672abd733db30ccac4e5ebeeedeb38418a5925e57b0f822df814a0d18e42474e815b62da57cf67bcd8ed1c90d4f8ecf8f6d0b2e66b9656be2686ada0e4dc3683f731f21c0c34a10d7ffac39b20a64ac326269433a5cacaeb90a8a17da0e3f8b04c275387c6222b6536967f2f1e6fc76dc6ee0e705d3e505f3d07e8bdd4a0deaf89533b13c20ff50ff3f03ff3a2daa8d1329a6a6d17a58c422cbe5ee2f80aa022b542269e108a24dc0ed74e62fc571185dcf398acfbf15a7fb6ce3e8aba50d6a0f29369f8c3d70bc9f472c2175ab5495edcf35a65527f67d391068c0275284307a0c93bd89abbea5ae96496a12d236323d11d2da9cde7a3b9fdb15d504f4ea1eda680",
+                                "0xf90151a000595129cf1c67ce97ed615df7184fb47a0d018d9147a2a7952a639e464cdfd380a052081f67d885b439bee62a1c4e09c02a1ec729aef4d92be6584a29141a79c5c7a0d99cae2bc3b6fc3e8e2767b4d7a5884b9b2d9d20da7890318beefcdb9c7346d58080a0f63571735d99e763dafadb03d1abe3a93a98740ecddc8514d13df46a35a8d94680a081870f4697e57436ccdd8bdc1d624d7bc07861748ff8b3a352334df68f2c03ada0f0252504ee8753335ecf0ca1f73cf13d4505783ed5110bf4e9b384a68ad88f69a0d38a18ef7b993c9ad2d848453e7722c26998ff3d63e243b99cdab0dabf84157ea06e5ad479dbda7f1647ed613e35d837f5d2c697ef34160f3665173186553ee9c280a0bf8371cac505b6ea0cb0f67ef744713f306a2455f3f8844cfa527c62db59c69980a0d6d689405b1cf73786c5fdabb55ec22f9b5712d1ba9c0bfcd46d4b93721fcac780",
+                                "0xf8669d37f29e142d49f8824d4e7f1735ec3da219687387629b5fccd86812df84b846f8440180a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a01d93f60f105899172f7255c030301c3af4564edd4a48577dbdc448aec7ddb0ac"),
+                        // String key, String value, List<String> proof
+                        Arrays.asList(
+                                new EthGetProof.StorageProof(
+                                        "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+                                        "0x0",
+                                        new ArrayList<>())));
+        assertEquals(proof, ethGetProof.getProof());
+    }
+
+    @Test
+    void testEthGetWork() {
 
         buildResponse(
                 "{\n"
@@ -1418,7 +1818,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthSubmitWork() {
+    void testEthSubmitWork() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1431,7 +1831,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testEthSubmitHashrate() {
+    void testEthSubmitHashrate() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1444,7 +1844,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testDbPutString() {
+    void testDbPutString() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1457,7 +1857,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testDbGetString() {
+    void testDbGetString() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1470,7 +1870,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testDbPutHex() {
+    void testDbPutHex() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1483,7 +1883,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testDbGetHex() {
+    void testDbGetHex() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1496,7 +1896,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testSshVersion() {
+    void testSshVersion() {
         buildResponse(
                 "{\n"
                         + "  \"id\":67,\n"
@@ -1509,7 +1909,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testSshPost() {
+    void testSshPost() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1522,7 +1922,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testSshNewIdentity() {
+    void testSshNewIdentity() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1540,7 +1940,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testSshHasIdentity() {
+    void testSshHasIdentity() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1553,7 +1953,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testSshNewGroup() {
+    void testSshNewGroup() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1571,7 +1971,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testSshAddToGroup() {
+    void testSshAddToGroup() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1584,7 +1984,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testSshNewFilter() {
+    void testSshNewFilter() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1597,7 +1997,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testSshUninstallFilter() {
+    void testSshUninstallFilter() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1610,7 +2010,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testSshMessages() {
+    void testSshMessages() {
         buildResponse(
                 "{\n"
                         + "  \"id\":1,\n"
@@ -1647,7 +2047,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testBooleanResponse() {
+    void testBooleanResponse() {
         buildResponse(
                 "{\n"
                         + "    \"jsonrpc\":\"2.0\",\n"
@@ -1660,7 +2060,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testAdminDataDir() {
+    void testAdminDataDir() {
         buildResponse(
                 "{\n"
                         + "    \"jsonrpc\":\"2.0\",\n"
@@ -1673,7 +2073,7 @@ public class ResponseTest extends ResponseTester {
     }
 
     @Test
-    public void testTxPoolStatus() {
+    void testTxPoolStatus() {
         buildResponse(
                 "{\n"
                         + "    \"jsonrpc\":\"2.0\",\n"
@@ -1683,7 +2083,7 @@ public class ResponseTest extends ResponseTester {
                         + "}");
 
         TxPoolStatus status = deserialiseResponse(TxPoolStatus.class);
-        assertEquals(status.getPending(), 10);
-        assertEquals(status.getQueued(), 7);
+        assertEquals(10, status.getPending());
+        assertEquals(7, status.getQueued());
     }
 }

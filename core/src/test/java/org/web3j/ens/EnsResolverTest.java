@@ -20,8 +20,10 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.Call;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
+import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,8 +31,10 @@ import org.junit.jupiter.api.Test;
 
 import org.web3j.abi.TypeEncoder;
 import org.web3j.abi.datatypes.Utf8String;
+import org.web3j.crypto.Credentials;
 import org.web3j.dto.EnsGatewayResponseDTO;
 import org.web3j.ens.contracts.generated.OffchainResolverContract;
+import org.web3j.ens.contracts.generated.ReverseRegistrar;
 import org.web3j.protocol.ObjectMapperFactory;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.Web3jService;
@@ -40,6 +44,7 @@ import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthCall;
 import org.web3j.protocol.core.methods.response.EthSyncing;
 import org.web3j.protocol.core.methods.response.NetVersion;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.ChainIdLong;
 import org.web3j.utils.EnsUtils;
 import org.web3j.utils.Numeric;
@@ -58,7 +63,7 @@ import static org.web3j.ens.EnsResolver.DEFAULT_SYNC_THRESHOLD;
 import static org.web3j.ens.EnsResolver.isValidEnsName;
 import static org.web3j.protocol.http.HttpService.JSON_MEDIA_TYPE;
 
-public class EnsResolverTest {
+class EnsResolverTest {
 
     private Web3j web3j;
     private Web3jService web3jService;
@@ -68,9 +73,9 @@ public class EnsResolverTest {
 
     private static List<String> urls = new ArrayList<>();
 
-    private String sender = "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8";
+    private String sender;
 
-    private String data = "0x00112233";
+    private String data;
 
     public static String LOOKUP_HEX =
             "0x556f1830000000000000000000000000c1735677a60884abbcf72295e88d47764beda28200000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000160f4d4d2f800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000028000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000004768747470733a2f2f6f6666636861696e2d7265736f6c7665722d6578616d706c652e75632e722e61707073706f742e636f6d2f7b73656e6465727d2f7b646174617d2e6a736f6e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e49061b92300000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000001701310f6f6666636861696e6578616d706c65036574680000000000000000000000000000000000000000000000000000000000000000000000000000000000243b3b57de1c9fb8c1fe76f464ccec6d2c003169598fdfcbcb6bbddf6af9c097a39fa0048c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e49061b92300000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000001701310f6f6666636861696e6578616d706c65036574680000000000000000000000000000000000000000000000000000000000000000000000000000000000243b3b57de1c9fb8c1fe76f464ccec6d2c003169598fdfcbcb6bbddf6af9c097a39fa0048c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
@@ -89,10 +94,12 @@ public class EnsResolverTest {
         web3jService = mock(Web3jService.class);
         web3j = Web3j.build(web3jService);
         ensResolver = new EnsResolver(web3j);
+        data = "0x00112233";
+        sender = "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8";
     }
 
     @Test
-    public void testResolve() throws Exception {
+    void testResolve() throws Exception {
         configureSyncing(false);
         configureLatestBlock(System.currentTimeMillis() / 1000); // block timestamp is in seconds
 
@@ -121,7 +128,7 @@ public class EnsResolverTest {
     }
 
     @Test
-    public void testResolveEnsNameEmptyOrDot() throws Exception {
+    void testResolveEnsNameEmptyOrDot() {
         assertNull(ensResolver.resolve(" "));
         assertNull(ensResolver.resolve(""));
         assertNull(ensResolver.resolve("."));
@@ -129,7 +136,7 @@ public class EnsResolverTest {
     }
 
     @Test
-    public void testReverseResolve() throws Exception {
+    void testReverseResolve() throws Exception {
         configureSyncing(false);
         configureLatestBlock(System.currentTimeMillis() / 1000); // block timestamp is in seconds
 
@@ -160,14 +167,14 @@ public class EnsResolverTest {
     }
 
     @Test
-    public void testIsSyncedSyncing() throws Exception {
+    void testIsSyncedSyncing() throws Exception {
         configureSyncing(true);
 
         assertFalse(ensResolver.isSynced());
     }
 
     @Test
-    public void testIsSyncedFullySynced() throws Exception {
+    void testIsSyncedFullySynced() throws Exception {
         configureSyncing(false);
         configureLatestBlock(System.currentTimeMillis() / 1000); // block timestamp is in seconds
 
@@ -175,7 +182,7 @@ public class EnsResolverTest {
     }
 
     @Test
-    public void testIsSyncedBelowThreshold() throws Exception {
+    void testIsSyncedBelowThreshold() throws Exception {
         configureSyncing(false);
         configureLatestBlock((System.currentTimeMillis() / 1000) - DEFAULT_SYNC_THRESHOLD);
 
@@ -201,7 +208,7 @@ public class EnsResolverTest {
     }
 
     @Test
-    public void testIsEnsName() {
+    void testIsEnsName() {
         assertTrue(isValidEnsName("eth"));
         assertTrue(isValidEnsName("web3.eth"));
         assertTrue(isValidEnsName("0x19e03255f667bdfd50a32722df860b1eeaf4d635.eth"));
@@ -232,8 +239,8 @@ public class EnsResolverTest {
     @Test
     void buildRequestWhenPostSuccessTest() throws IOException {
         String url = "https://example.com/gateway/{sender}.json";
-        String sender = "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8";
-        String data = "0xd5fa2b00";
+        sender = "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8";
+        data = "0xd5fa2b00";
 
         okhttp3.Request request = ensResolver.buildRequest(url, sender, data);
 
@@ -247,26 +254,26 @@ public class EnsResolverTest {
     }
 
     @Test
-    void buildRequestWhenWithoutDataTest() throws IOException {
+    void buildRequestWhenWithoutDataTest() {
         String url = "https://example.com/gateway/{sender}.json";
-        String sender = "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8";
+        sender = "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8";
 
         assertThrows(
                 EnsResolutionException.class, () -> ensResolver.buildRequest(url, sender, null));
     }
 
     @Test
-    void buildRequestWhenWithoutSenderTest() throws IOException {
+    void buildRequestWhenWithoutSenderTest() {
         String url = "https://example.com/gateway/{sender}.json";
-        String data = "0xd5fa2b00";
+        data = "0xd5fa2b00";
 
         assertThrows(EnsResolutionException.class, () -> ensResolver.buildRequest(url, null, data));
     }
 
     @Test
-    void buildRequestWhenNotValidSenderTest() throws IOException {
+    void buildRequestWhenNotValidSenderTest() {
         String url = "https://example.com/gateway/{sender}.json";
-        String data = "0xd5fa2b00";
+        data = "0xd5fa2b00";
 
         assertThrows(
                 EnsResolutionException.class,
@@ -274,10 +281,10 @@ public class EnsResolverTest {
     }
 
     @Test
-    void buildRequestWhenNotValidUrl() throws IOException {
+    void buildRequestWhenNotValidUrl() {
         String url = "https://example.com/gateway/{data}.json";
-        String sender = "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8";
-        String data = "0xd5fa2b00";
+        sender = "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8";
+        data = "0xd5fa2b00";
 
         assertThrows(
                 EnsResolutionException.class, () -> ensResolver.buildRequest(url, sender, data));
@@ -454,6 +461,8 @@ public class EnsResolverTest {
     class EnsResolverForTest extends EnsResolver {
         private OffchainResolverContract resolverMock;
 
+        private ReverseRegistrar reverseRegistrarMock;
+
         public EnsResolverForTest(Web3j web3j) {
             super(web3j);
         }
@@ -463,12 +472,27 @@ public class EnsResolverTest {
             return resolverMock;
         }
 
+        @Override
+        protected OffchainResolverContract obtainOffchainResolver(
+                String ensName, Credentials credentials) {
+            return resolverMock;
+        }
+
+        @Override
+        protected ReverseRegistrar getReverseRegistrarContract(Credentials credentials) {
+            return reverseRegistrarMock;
+        }
+
         public OffchainResolverContract getResolverMock() {
             return resolverMock;
         }
 
         public void setResolverMock(OffchainResolverContract resolverMock) {
             this.resolverMock = resolverMock;
+        }
+
+        public void setReverseRegistrarMock(ReverseRegistrar reverseRegistrarMock) {
+            this.reverseRegistrarMock = reverseRegistrarMock;
         }
     }
 
@@ -523,6 +547,134 @@ public class EnsResolverTest {
                 () -> ensResolverForTest.resolve("1.offchainexample.eth"));
     }
 
+    @Test
+    void testGetEnsTextSuccess() throws Exception {
+        String expectedText = "value";
+        String name = "example.eth";
+        String key = "key";
+
+        OffchainResolverContract resolverMock = mock(OffchainResolverContract.class);
+
+        RemoteFunctionCall<String> remoteFunctionCallMock = mock(RemoteFunctionCall.class);
+        when(resolverMock.text(any(), eq(key))).thenReturn(remoteFunctionCallMock);
+        when(remoteFunctionCallMock.send()).thenReturn(expectedText);
+
+        EnsResolverForTest ensResolverForTest = new EnsResolverForTest(web3j);
+        ensResolverForTest.setResolverMock(resolverMock);
+
+        String result = ensResolverForTest.getEnsText(name, key);
+
+        assertNotNull(result);
+        assertEquals(expectedText, result);
+    }
+
+    @Test
+    void testSetEnsTextSuccess() throws Exception {
+        String name = "example.eth";
+        String key = "key";
+        String value = "value";
+
+        TransactionReceipt receipt = new TransactionReceipt();
+        receipt.setTransactionHash("0x123");
+
+        Credentials credentials = mock(Credentials.class);
+
+        OffchainResolverContract resolverMock = mock(OffchainResolverContract.class);
+        RemoteFunctionCall<TransactionReceipt> remoteFunctionCallMock =
+                mock(RemoteFunctionCall.class);
+
+        when(resolverMock.setText(any(), eq(key), eq(value))).thenReturn(remoteFunctionCallMock);
+        when(remoteFunctionCallMock.send()).thenReturn(receipt);
+
+        EnsResolverForTest ensResolverForTest = new EnsResolverForTest(web3j);
+        ensResolverForTest.setResolverMock(resolverMock);
+
+        TransactionReceipt receiptResult =
+                ensResolverForTest.setEnsText(name, key, value, credentials);
+
+        assertNotNull(receiptResult);
+        assertEquals(receipt.getTransactionHash(), receiptResult.getTransactionHash());
+    }
+
+    @Test
+    void testSetReverseName() throws Exception {
+        String name = "example.eth";
+        Credentials credentials = mock(Credentials.class);
+
+        TransactionReceipt receipt = new TransactionReceipt();
+        receipt.setTransactionHash("0x123");
+        ReverseRegistrar reverseRegistrarMock = mock(ReverseRegistrar.class);
+        RemoteFunctionCall<TransactionReceipt> remoteFunctionCallMock =
+                mock(RemoteFunctionCall.class);
+
+        when(remoteFunctionCallMock.send()).thenReturn(receipt);
+        when(reverseRegistrarMock.setName(name)).thenReturn(remoteFunctionCallMock);
+
+        EnsResolverForTest resolver = new EnsResolverForTest(web3j);
+        resolver.setReverseRegistrarMock(reverseRegistrarMock);
+
+        TransactionReceipt receiptResult = resolver.setReverseName(name, credentials);
+
+        assertNotNull(receiptResult);
+        assertEquals(receipt.getTransactionHash(), receiptResult.getTransactionHash());
+    }
+
+    @Test
+    void testSetNameForAddr() throws Exception {
+        String addr = "0x41563129cdbbd0c5d3e1c86cf9563926b243834d";
+        String owner = "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8";
+        String resolver = "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8";
+        String name = "example.eth";
+        Credentials credentials = mock(Credentials.class);
+
+        TransactionReceipt receipt = new TransactionReceipt();
+        receipt.setTransactionHash("0xabc123");
+
+        ReverseRegistrar reverseRegistrarMock = mock(ReverseRegistrar.class);
+        RemoteFunctionCall<TransactionReceipt> remoteFunctionCallMock =
+                mock(RemoteFunctionCall.class);
+
+        when(remoteFunctionCallMock.send()).thenReturn(receipt);
+        when(reverseRegistrarMock.setNameForAddr(addr, owner, resolver, name))
+                .thenReturn(remoteFunctionCallMock);
+
+        EnsResolverForTest resolverObj = new EnsResolverForTest(web3j);
+        resolverObj.setReverseRegistrarMock(reverseRegistrarMock);
+
+        TransactionReceipt receiptResult =
+                resolverObj.setReverseName(addr, owner, resolver, name, credentials);
+
+        assertNotNull(receiptResult);
+        assertEquals(receipt.getTransactionHash(), receiptResult.getTransactionHash());
+    }
+
+    @Test
+    void testGetEnsMetadataSuccess() throws Exception {
+        OkHttpClient httpClientMock = mock(OkHttpClient.class);
+        String name = "example.eth";
+        String apiUrl = "https://ens-api.example.com/";
+
+        NetVersion netVersion = new NetVersion();
+        netVersion.setResult(Long.toString(ChainIdLong.MAINNET));
+        when(web3jService.send(any(Request.class), eq(NetVersion.class))).thenReturn(netVersion);
+
+        EnsMetadataResponse expectedResponse = new EnsMetadataResponse();
+        expectedResponse.setName("example.eth");
+        expectedResponse.setDescription("example.eth, an ENS name.");
+        String jsonResponse = new ObjectMapper().writeValueAsString(expectedResponse);
+
+        okhttp3.Response mockResponse = buildResponse(200, apiUrl, jsonResponse);
+        Call mockCall = mock(Call.class);
+        when(mockCall.execute()).thenReturn(mockResponse);
+        when(httpClientMock.newCall(any())).thenReturn(mockCall);
+
+        EnsMetadataResponse actualResponse = ensResolver.getEnsMetadata(name);
+
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getDescription(), actualResponse.getDescription());
+    }
+
     private okhttp3.Response buildResponse(int code, String url, String sender, String data)
             throws JsonProcessingException {
         EnsGatewayResponseDTO responseDTO = new EnsGatewayResponseDTO(data);
@@ -533,6 +685,18 @@ public class EnsResolverTest {
                 .code(code)
                 .body(ResponseBody.create(om.writeValueAsString(responseDTO), JSON_MEDIA_TYPE))
                 .message("Some error message Code: " + code)
+                .build();
+    }
+
+    private okhttp3.Response buildResponse(int code, String url, String jsonBody) {
+        okhttp3.Request request = new okhttp3.Request.Builder().url(url).build();
+
+        return new Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_2)
+                .code(code)
+                .message("Response Message")
+                .body(ResponseBody.create(jsonBody, MediaType.parse("application/json")))
                 .build();
     }
 }

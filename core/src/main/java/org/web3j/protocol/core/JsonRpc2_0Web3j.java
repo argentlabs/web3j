@@ -34,6 +34,7 @@ import org.web3j.protocol.core.methods.response.DbGetString;
 import org.web3j.protocol.core.methods.response.DbPutHex;
 import org.web3j.protocol.core.methods.response.DbPutString;
 import org.web3j.protocol.core.methods.response.EthAccounts;
+import org.web3j.protocol.core.methods.response.EthBaseFee;
 import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthBlockNumber;
 import org.web3j.protocol.core.methods.response.EthChainId;
@@ -46,10 +47,12 @@ import org.web3j.protocol.core.methods.response.EthFeeHistory;
 import org.web3j.protocol.core.methods.response.EthFilter;
 import org.web3j.protocol.core.methods.response.EthGasPrice;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
+import org.web3j.protocol.core.methods.response.EthGetBlockReceipts;
 import org.web3j.protocol.core.methods.response.EthGetBlockTransactionCountByHash;
 import org.web3j.protocol.core.methods.response.EthGetBlockTransactionCountByNumber;
 import org.web3j.protocol.core.methods.response.EthGetCode;
 import org.web3j.protocol.core.methods.response.EthGetCompilers;
+import org.web3j.protocol.core.methods.response.EthGetProof;
 import org.web3j.protocol.core.methods.response.EthGetStorageAt;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
@@ -96,6 +99,8 @@ import org.web3j.utils.Numeric;
 public class JsonRpc2_0Web3j implements Web3j {
 
     public static final int DEFAULT_BLOCK_TIME = 15 * 1000;
+    private static final BigInteger MIN_BLOB_BASE_FEE = new BigInteger("1");
+    private static final BigInteger BLOB_BASE_FEE_UPDATE_FRACTION = new BigInteger("3338477");
 
     protected final Web3jService web3jService;
     private final JsonRpc2_0Rx web3jRx;
@@ -233,22 +238,20 @@ public class JsonRpc2_0Web3j implements Web3j {
     }
 
     @Override
-    @Deprecated
-    public Request<?, EthFeeHistory> ethFeeHistory(
-            int blockCount, DefaultBlockParameter newestBlock, List<Double> rewardPercentiles) {
+    public Request<?, EthBaseFee> ethBaseFee() {
         return new Request<>(
-                "eth_feeHistory",
-                Arrays.asList(blockCount, newestBlock.getValue(), rewardPercentiles),
-                web3jService,
-                EthFeeHistory.class);
+                "eth_baseFee", Collections.<String>emptyList(), web3jService, EthBaseFee.class);
     }
 
     @Override
     public Request<?, EthFeeHistory> ethFeeHistory(
-            String blockCount, DefaultBlockParameter newestBlock, List<Double> rewardPercentiles) {
+            int blockCount, DefaultBlockParameter newestBlock, List<Double> rewardPercentiles) {
         return new Request<>(
                 "eth_feeHistory",
-                Arrays.asList(blockCount, newestBlock.getValue(), rewardPercentiles),
+                Arrays.asList(
+                        Numeric.encodeQuantity(BigInteger.valueOf(blockCount)),
+                        newestBlock.getValue(),
+                        rewardPercentiles),
                 web3jService,
                 EthFeeHistory.class);
     }
@@ -455,6 +458,16 @@ public class JsonRpc2_0Web3j implements Web3j {
     }
 
     @Override
+    public Request<?, EthGetBlockReceipts> ethGetBlockReceipts(
+            DefaultBlockParameter defaultBlockParameter) {
+        return new Request<>(
+                "eth_getBlockReceipts",
+                Arrays.asList(defaultBlockParameter.getValue()),
+                web3jService,
+                EthGetBlockReceipts.class);
+    }
+
+    @Override
     public Request<?, EthBlock> ethGetUncleByBlockHashAndIndex(
             String blockHash, BigInteger transactionIndex) {
         return new Request<>(
@@ -563,6 +576,16 @@ public class JsonRpc2_0Web3j implements Web3j {
     public Request<?, EthLog> ethGetLogs(
             org.web3j.protocol.core.methods.request.EthFilter ethFilter) {
         return new Request<>("eth_getLogs", Arrays.asList(ethFilter), web3jService, EthLog.class);
+    }
+
+    @Override
+    public Request<?, EthGetProof> ethGetProof(
+            String address, List<String> storageKeys, String quantity) {
+        return new Request<>(
+                "eth_getProof",
+                Arrays.asList(address, storageKeys, quantity),
+                web3jService,
+                EthGetProof.class);
     }
 
     @Override
@@ -854,5 +877,38 @@ public class JsonRpc2_0Web3j implements Web3j {
     @Override
     public BatchRequest newBatch() {
         return new BatchRequest(web3jService);
+    }
+
+    @Override
+    public BigInteger ethGetBaseFeePerBlobGas() {
+        try {
+            EthBlock ethBlock =
+                    web3jService.send(
+                            ethGetBlockByNumber(DefaultBlockParameter.valueOf("latest"), false),
+                            EthBlock.class);
+            return fakeExponential(ethBlock.getBlock().getExcessBlobGas());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get baseFeePerBlobGas value: ", e);
+        }
+    }
+
+    private static BigInteger fakeExponential(BigInteger numerator) {
+        BigInteger i = BigInteger.ONE;
+        BigInteger output = BigInteger.ZERO;
+        BigInteger numeratorAccum = MIN_BLOB_BASE_FEE.multiply(BLOB_BASE_FEE_UPDATE_FRACTION);
+        while (numeratorAccum.compareTo(BigInteger.ZERO) > 0) {
+            output = output.add(numeratorAccum);
+            numeratorAccum =
+                    numeratorAccum
+                            .multiply(numerator)
+                            .divide(BLOB_BASE_FEE_UPDATE_FRACTION.multiply(i));
+            i = i.add(BigInteger.ONE);
+        }
+        return output.divide(BLOB_BASE_FEE_UPDATE_FRACTION);
+    }
+
+    @Override
+    public void close() throws Exception {
+        this.shutdown();
     }
 }

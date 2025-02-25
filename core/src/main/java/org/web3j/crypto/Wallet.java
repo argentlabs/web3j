@@ -29,6 +29,7 @@ import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.generators.SCrypt;
 import org.bouncycastle.crypto.params.KeyParameter;
 
+import org.web3j.crypto.exception.CipherException;
 import org.web3j.utils.Numeric;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -70,6 +71,8 @@ public class Wallet {
     private static final String CIPHER = "aes-128-ctr";
     static final String AES_128_CTR = "pbkdf2";
     static final String SCRYPT = "scrypt";
+
+    private Wallet() {}
 
     public static WalletFile create(String password, ECKeyPair ecKeyPair, int n, int p)
             throws CipherException {

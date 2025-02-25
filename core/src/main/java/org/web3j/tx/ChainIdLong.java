@@ -19,9 +19,15 @@ public class ChainIdLong {
     public static final long ROPSTEN = 3;
     public static final long RINKEBY = 4;
     public static final long GOERLI = 5;
+    public static final long SEPOLIA = 11155111;
+    public static final long HOLESKY = 17000;
     public static final long ROOTSTOCK_MAINNET = 30;
     public static final long ROOTSTOCK_TESTNET = 31;
     public static final long KOVAN = 42;
     public static final long ETHEREUM_CLASSIC_MAINNET = 61;
     public static final long ETHEREUM_CLASSIC_TESTNET = 62;
+    public static final long LINEA = 59144;
+    public static final long LINEA_SEPOLIA = 59141;
+
+    private ChainIdLong() {}
 }

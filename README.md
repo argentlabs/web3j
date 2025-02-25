@@ -1,18 +1,18 @@
 Web3j: Web3 Java Ethereum Ðapp API
 ==================================
 
-[![Documentation Status](https://img.shields.io/travis/web3j/web3j-docs?label=docs)](https://docs.web3j.io/)
-[![Build Status](https://travis-ci.org/web3j/web3j.svg?branch=master)](https://travis-ci.org/web3j/web3j)
-[![codecov](https://codecov.io/gh/web3j/web3j/branch/master/graph/badge.svg)](https://codecov.io/gh/web3j/web3j)
+[![Documentation Status](https://readthedocs.org/projects/web3j-docs/badge/?version=latest)](https://docs.web3j.io)
+[![build status](https://github.com/web3j/web3j/actions/workflows/build.yml/badge.svg)](https://github.com/web3j/web3j/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/web3j/web3j/branch/main/graph/badge.svg?token=a4G9ITI6CU)](https://codecov.io/gh/web3j/web3j)
 [![Discord](https://img.shields.io/discord/779382027614158919?label=discord)](https://discord.gg/A9UXfPF2tS)
-
+[![Gurubase](https://img.shields.io/badge/Gurubase-Ask%20Web3j%20Guru-006BFF)](https://gurubase.io/g/web3j)
 
 
 Web3j is a lightweight, highly modular, reactive, type safe Java and
 Android library for working with Smart Contracts and integrating with
 clients (nodes) on the Ethereum network:
 
-![image](https://github.com/web3j/web3j-docs/blob/master/docs/img/web3j_network.png)
+![image](https://github.com/hyperledger-web3j/web3j-docs/blob/main/docs/img/web3j_network.png)
 
 This allows you to work with the [Ethereum](https://www.ethereum.org/)
 blockchain, without the additional overhead of having to write your own
@@ -20,6 +20,14 @@ integration code for the platform.
 
 The [Java and the Blockchain](https://www.youtube.com/watch?v=ea3miXs_P6Y) talk provides
 an overview of blockchain, Ethereum and Web3j.
+
+NEW! Get involved!
+--------
+Since Web3J moved under Hyperledger we started to do Web3J Contributors calls every 2 weeks!
+Subscribe to our community page and to see check our call schedule.
+Your contribution matters!
+- [Community Link](https://lists.hyperledger.org/g/web3j) - Check our last updates! 
+- [Calendar Invite](https://lists.hyperledger.org/g/web3j/ics/invite.ics?repeatid=57401) - Add the contributor call to your calendar!
 
 Features
 --------
@@ -62,8 +70,7 @@ It has five runtime dependencies:
     for HTTP connections
 -   [Jackson Core](https://github.com/FasterXML/jackson-core) for fast
     JSON serialisation/deserialization
--   [Bouncy Castle](https://www.bouncycastle.org/) ([Spongy
-    Castle](https://rtyley.github.io/spongycastle/) on Android) for
+-   [Bouncy Castle](https://www.bouncycastle.org/) for
     crypto
 -   [Jnr-unixsocket](https://github.com/jnr/jnr-unixsocket) for \*nix
     IPC (not available on Android)
@@ -86,7 +93,7 @@ curl -L get.web3j.io | sh && source ~/.web3j/source.sh
 For Windows, in Powershell:
 
 ```shell script
-Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/web3j/web3j-installer/master/installer.ps1'))
+Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/hyperledger/web3j-installer/main/installer.ps1'))
 ```
 
 Create a new project by running:
@@ -111,9 +118,12 @@ Java:
 <dependency>
   <groupId>org.web3j</groupId>
   <artifactId>core</artifactId>
-  <version>4.8.7</version>
+  <version>4.12.2</version>
 </dependency>
 ```
+
+**Note:** The Web3j Java binaries are compiled using Java 17. Java 17 or a more recent version is required to use Web3j
+ as a dependency.
 
 Android:
 
@@ -121,7 +131,7 @@ Android:
 <dependency>
   <groupId>org.web3j</groupId>
   <artifactId>core</artifactId>
-  <version>4.8.7-android</version>
+  <version>4.8.9-android</version>
 </dependency>
 ```
 
@@ -131,13 +141,13 @@ Gradle
 Java:
 
 ```groovy
-implementation ('org.web3j:core:4.8.7')
+implementation ('org.web3j:core:4.12.2')
 ```
 
 Android:
 
 ```groovy
-implementation ('org.web3j:core:4.8.7-android')
+implementation ('org.web3j:core:4.8.9-android')
 ```
 
 Build instructions
@@ -173,6 +183,101 @@ $ ./gradlew -Pintegration-tests=false :test
 
 Check the [Docker client API](https://github.com/docker-java/docker-java/blob/master/docs/getting_started.md#instantiating-a-dockerclientconfig)
 for more information on configuration options.
+
+
+Projects using Web3j
+------------------
+
+<a href="https://alphawallet.com/">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="static-imgs/alphawallet-dark.svg">
+    <img alt="Alphawallet logo" src="static-imgs/alphawallet-light.svg" width="auto" height="50">
+  </picture>
+</a>
+
+<a href="https://linea.build">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="static-imgs/linea-dark.svg">
+    <img alt="Linea logo" src="static-imgs/linea-light.svg" width="auto" height="50">
+  </picture>
+</a>
+
+<a href="https://consensys.io/">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="static-imgs/consensys-dark.svg">
+    <img alt="ConsenSys logo" src="static-imgs/consensys-light.svg" width="auto" height="50">
+  </picture>
+</a>
+
+<a href="https://ens.domains">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="static-imgs/ens-dark.svg">
+    <img alt="ENS logo" src="static-imgs/ens-light.svg" width="auto" height="50">
+  </picture>
+</a>
+
+<a href="https://github.com/hyperledger/besu">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="static-imgs/hyperledger-besu-dark.svg">
+    <img alt="Hyperledger Besu logo" src="static-imgs/hyperledger-besu-light.svg" width="auto" height="50">
+  </picture>
+</a>
+
+<a href="https://web3auth.io">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="static-imgs/web3auth_dark.svg">
+    <img alt="Web3Auth logo" src="static-imgs/web3auth_light.svg" width="auto" height="50">
+  </picture>
+</a>
+
+<a href="https://hedera.com">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="static-imgs/hedera-dark.svg">
+    <img alt="Hedera logo" src="static-imgs/hedera-light.svg" width="auto" height="50">
+  </picture>
+</a>
+
+<a href="https://celo.org">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="static-imgs/celo-dark.svg">
+    <img alt="Celo logo" src="static-imgs/celo-light.svg" width="auto" height="50">
+  </picture>
+</a>
+
+<a href="https://explorer.walletconnect.com/">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="static-imgs/walletconnect-dark.svg">
+    <img alt="WalletConnect logo" src="static-imgs/walletconnect-light.svg" width="auto" height="50">
+  </picture>
+</a>
+
+<a href="https://argent.xyz">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="static-imgs/argent-dark.svg">
+    <img alt="Argent logo" src="static-imgs/argent-light.svg" width="auto" height="50">
+  </picture>
+</a>
+
+<a href="https://unstoppabledomains.com">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="static-imgs/unstoppable_domains-dark.svg">
+    <img alt="Unstoppable Domains logo" src="static-imgs/unstoppable_domains-light.svg" width="auto" height="50">
+  </picture>
+</a>
+
+<a href="https://www.fnality.org/home">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="static-imgs/fnality-dark.svg">
+    <img alt="Fnality logo" src="static-imgs/fnality-light.svg" width="auto" height="50">
+  </picture>
+</a>
+
+<a href="https://zksync.io/">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="static-imgs/zksync-dark.svg">
+    <img alt="zksync logo" src="static-imgs/zksync-light.svg" width="auto" height="50">
+  </picture>
+</a>
 
 Commercial support and training
 -------------------------------

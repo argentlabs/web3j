@@ -12,6 +12,7 @@
  */
 package org.web3j.crypto;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.SignatureException;
@@ -81,6 +82,14 @@ public class Sign {
         return signMessage(message, keyPair, true);
     }
 
+    public static SignatureData signTypedData(String jsonData, ECKeyPair keyPair)
+            throws IOException {
+        StructuredDataEncoder dataEncoder = new StructuredDataEncoder(jsonData);
+        byte[] hashStructuredData = dataEncoder.hashStructuredData();
+
+        return signMessage(hashStructuredData, keyPair, false);
+    }
+
     public static SignatureData signMessage(byte[] message, ECKeyPair keyPair, boolean needToHash) {
         BigInteger publicKey = keyPair.getPublicKey();
         byte[] messageHash;
@@ -123,6 +132,43 @@ public class Sign {
         byte[] r = Numeric.toBytesPadded(sig.r, 32);
         byte[] s = Numeric.toBytesPadded(sig.s, 32);
 
+        return new Sign.SignatureData(v, r, s);
+    }
+
+    /**
+     * Returns SignatureData from hex signature.
+     *
+     * @param hexSignature hex representation of signature
+     * @return SignatureData
+     * @throws RuntimeException if signature has invalid format
+     */
+    public static SignatureData signatureDataFromHex(String hexSignature)
+            throws SignatureException {
+        byte[] sigBytes = Numeric.hexStringToByteArray(hexSignature);
+        byte v;
+        byte[] r, s;
+        if (sigBytes.length == 64) {
+            // EIP-2098; pull the v from the top bit of s and clear it
+            v = (byte) (27 + (sigBytes[32] >> 7));
+            sigBytes[32] &= 0x7f;
+            r = Arrays.copyOfRange(sigBytes, 0, 32);
+            s = Arrays.copyOfRange(sigBytes, 32, 64);
+
+        } else if (sigBytes.length == 65) {
+            r = Arrays.copyOfRange(sigBytes, 0, 32);
+            s = Arrays.copyOfRange(sigBytes, 32, 64);
+            v = sigBytes[64];
+        } else {
+            throw new SignatureException("invalid signature string");
+        }
+        // Allow a recid to be used as the v
+        if (v < 27) {
+            if (v == 0 || v == 1) {
+                v = (byte) (v + 27);
+            } else {
+                throw new SignatureException("signature invalid v byte");
+            }
+        }
         return new Sign.SignatureData(v, r, s);
     }
 

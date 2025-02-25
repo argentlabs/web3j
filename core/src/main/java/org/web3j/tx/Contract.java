@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,8 +52,9 @@ import org.web3j.tx.gas.ContractEIP1559GasProvider;
 import org.web3j.tx.gas.ContractGasProvider;
 import org.web3j.tx.gas.StaticGasProvider;
 import org.web3j.tx.response.EmptyTransactionReceipt;
-import org.web3j.utils.Numeric;
 
+import static org.web3j.crypto.Hash.sha3String;
+import static org.web3j.utils.Numeric.cleanHexPrefix;
 import static org.web3j.utils.RevertReasonExtractor.extractRevertReason;
 
 /**
@@ -76,6 +79,13 @@ public abstract class Contract extends ManagedTransaction {
     protected TransactionReceipt transactionReceipt;
     protected Map<String, String> deployedAddresses;
     protected DefaultBlockParameter defaultBlockParameter = DefaultBlockParameterName.LATEST;
+    private static final List<String> METADATA_HASH_INDICATORS =
+            Collections.unmodifiableList(
+                    Arrays.asList(
+                            "a165627a7a72305820" /*Swarm legacy (bzzr0)*/,
+                            "a265627a7a72315820" /*Swarm (bzzr1)*/,
+                            "a2646970667358221220" /*IPFS*/,
+                            "a164736f6c634300080a000a" /*solc (None)*/));
 
     protected Contract(
             String contractBinary,
@@ -253,10 +263,16 @@ public abstract class Contract extends ManagedTransaction {
             return false;
         }
 
-        String code = Numeric.cleanHexPrefix(ethGetCode.getCode());
-        int metadataIndex = code.indexOf("a165627a7a72305820");
-        if (metadataIndex != -1) {
-            code = code.substring(0, metadataIndex);
+        String code = cleanHexPrefix(ethGetCode.getCode());
+
+        int metadataIndex = -1;
+        for (String metadataIndicator : METADATA_HASH_INDICATORS) {
+            metadataIndex = code.indexOf(metadataIndicator);
+
+            if (metadataIndex != -1) {
+                code = code.substring(0, metadataIndex);
+                break;
+            }
         }
         // There may be multiple contracts in the Solidity bytecode, hence we only check for a
         // match with a subset
@@ -471,6 +487,41 @@ public abstract class Contract extends ManagedTransaction {
         contract.setTransactionReceipt(transactionReceipt);
 
         return contract;
+    }
+
+    public static class LinkReference {
+        final String source;
+        final String libraryName;
+        final Address address;
+
+        public LinkReference(String source, String libraryName, Address address) {
+            this.source = source;
+            this.libraryName = libraryName;
+            this.address = address;
+        }
+    }
+
+    public static String linkBinaryWithReferences(String binary, List<LinkReference> links) {
+        String replacingBinary = binary;
+        for (LinkReference link : links) {
+            // solc / hardhat convention
+            String libSourceName = link.source + ":" + link.libraryName;
+            String placeHolder = "__$" + sha3String(libSourceName).substring(2, 36) + "$__";
+            String addressReplacement = cleanHexPrefix(link.address.toString());
+            replacingBinary = replacingBinary.replace(placeHolder, addressReplacement);
+
+            // old version solc
+            String linkString = link.source + ":" + link.libraryName;
+            String oldSolcPlaceHolder =
+                    "__" + linkString + "_".repeat(40 - linkString.length() - 2);
+            replacingBinary = replacingBinary.replace(oldSolcPlaceHolder, addressReplacement);
+
+            // truffle old version
+            String trufflePlaceHolder =
+                    "__" + link.libraryName + "_".repeat(40 - link.libraryName.length() - 2);
+            replacingBinary = replacingBinary.replace(trufflePlaceHolder, addressReplacement);
+        }
+        return replacingBinary;
     }
 
     protected static <T extends Contract> T deploy(
@@ -740,7 +791,7 @@ public abstract class Contract extends ManagedTransaction {
     public static EventValues staticExtractEventParameters(Event event, Log log) {
         final List<String> topics = log.getTopics();
         String encodedEventSignature = EventEncoder.encode(event);
-        if (topics == null || topics.size() == 0 || !topics.get(0).equals(encodedEventSignature)) {
+        if (topics == null || topics.isEmpty() || !topics.get(0).equals(encodedEventSignature)) {
             return null;
         }
 
@@ -788,7 +839,7 @@ public abstract class Contract extends ManagedTransaction {
         return transactionReceipt.getLogs().stream()
                 .map(log -> extractEventParametersWithLog(event, log))
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     protected static List<EventValuesWithLog> staticExtractEventParametersWithLog(
@@ -796,7 +847,7 @@ public abstract class Contract extends ManagedTransaction {
         return transactionReceipt.getLogs().stream()
                 .map(log -> staticExtractEventParametersWithLog(event, log))
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**

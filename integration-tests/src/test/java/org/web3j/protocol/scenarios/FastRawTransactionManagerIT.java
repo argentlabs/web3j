@@ -38,8 +38,7 @@ import org.web3j.tx.response.PollingTransactionReceiptProcessor;
 import org.web3j.tx.response.QueuingTransactionReceiptProcessor;
 import org.web3j.utils.Convert;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.web3j.tx.TransactionManager.DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH;
 
 @EVMTest(type = NodeType.BESU)
@@ -94,6 +93,32 @@ public class FastRawTransactionManagerIT extends Scenario {
         }
 
         assertTrue(transactionReceipts.isEmpty());
+    }
+
+    @Test
+    public void testTransactionResetNonce() throws Exception {
+        FastRawTransactionManager transactionManager =
+                new FastRawTransactionManager(
+                        web3j,
+                        ALICE,
+                        new PollingTransactionReceiptProcessor(
+                                web3j, POLLING_FREQUENCY, DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH));
+
+        Transfer transfer = new Transfer(web3j, transactionManager);
+        BigInteger gasPrice = transfer.requestCurrentGasPrice();
+
+        createTransaction(transfer, gasPrice).send();
+        createTransaction(transfer, gasPrice).send();
+
+        BigInteger expected = transactionManager.getCurrentNonce();
+
+        transactionManager.resetNonce();
+
+        BigInteger actual = transactionManager.getCurrentNonce();
+
+        createTransaction(transfer, gasPrice).send();
+
+        assertEquals(expected, actual);
     }
 
     @Test

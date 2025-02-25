@@ -36,7 +36,7 @@ import java.util.List;
  * <p><strong>Do not modify!</strong>
  * <p>Please use the <a href="https://docs.web3j.io/command_line.html">web3j command line tools</a>,
  * or the org.web3j.codegen.SolidityFunctionWrapperGenerator in the
- * <a href="https://github.com/web3j/web3j/tree/master/codegen">codegen module</a> to update.
+ * <a href="https://github.com/hyperledger/web3j/tree/main/codegen">codegen module</a> to update.
  *
  * <p>Generated with web3j version 1.4.1.
  */
@@ -60,7 +60,6 @@ public class OffchainResolverContract extends PublicResolver {
 
     public static final Event NEWSIGNERS_EVENT = new Event("NewSigners",
             Arrays.<TypeReference<?>>asList(new TypeReference<DynamicArray<Address>>() {}));
-    ;
 
     public OffchainResolverContract(String contractAddress, Web3j web3j, Credentials credentials, BigInteger gasPrice, BigInteger gasLimit) {
         super(contractAddress, web3j, credentials, gasPrice, gasLimit);
@@ -80,7 +79,7 @@ public class OffchainResolverContract extends PublicResolver {
 
     public List<NewSignersEventResponse> getNewSignersEvents(TransactionReceipt transactionReceipt) {
         List<Contract.EventValuesWithLog> valueList = extractEventParametersWithLog(NEWSIGNERS_EVENT, transactionReceipt);
-        ArrayList<NewSignersEventResponse> responses = new ArrayList<NewSignersEventResponse>(valueList.size());
+        ArrayList<NewSignersEventResponse> responses = new ArrayList<>(valueList.size());
         for (Contract.EventValuesWithLog eventValues : valueList) {
             NewSignersEventResponse typedResponse = new NewSignersEventResponse();
             typedResponse.log = eventValues.getLog();

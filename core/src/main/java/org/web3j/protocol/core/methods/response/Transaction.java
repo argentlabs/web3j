@@ -38,10 +38,13 @@ public class Transaction {
     private String r;
     private String s;
     private long v; // see https://github.com/web3j/web3j/issues/44
+    private String yParity;
     private String type;
     private String maxFeePerGas;
     private String maxPriorityFeePerGas;
     private List<AccessListObject> accessList;
+    private String maxFeePerBlobGas;
+    private List<String> blobVersionedHashes;
 
     public Transaction() {}
 
@@ -111,6 +114,7 @@ public class Transaction {
             String r,
             String s,
             long v,
+            String yParity,
             String type,
             String maxFeePerGas,
             String maxPriorityFeePerGas,
@@ -133,10 +137,64 @@ public class Transaction {
         this.r = r;
         this.s = s;
         this.v = v;
+        this.yParity = yParity;
         this.type = type;
         this.maxFeePerGas = maxFeePerGas;
         this.maxPriorityFeePerGas = maxPriorityFeePerGas;
         this.accessList = accessList;
+    }
+
+    public Transaction(
+            String hash,
+            String nonce,
+            String blockHash,
+            String blockNumber,
+            String chainId,
+            String transactionIndex,
+            String from,
+            String to,
+            String value,
+            String gas,
+            String gasPrice,
+            String input,
+            String creates,
+            String publicKey,
+            String raw,
+            String r,
+            String s,
+            long v,
+            String yParity,
+            String type,
+            String maxFeePerGas,
+            String maxPriorityFeePerGas,
+            List accessList,
+            String maxFeePerBlobGas,
+            List versionedHashes) {
+        this.hash = hash;
+        this.nonce = nonce;
+        this.blockHash = blockHash;
+        this.blockNumber = blockNumber;
+        this.chainId = chainId;
+        this.transactionIndex = transactionIndex;
+        this.from = from;
+        this.to = to;
+        this.value = value;
+        this.gasPrice = gasPrice;
+        this.gas = gas;
+        this.input = input;
+        this.creates = creates;
+        this.publicKey = publicKey;
+        this.raw = raw;
+        this.r = r;
+        this.s = s;
+        this.v = v;
+        this.yParity = yParity;
+        this.type = type;
+        this.maxFeePerGas = maxFeePerGas;
+        this.maxPriorityFeePerGas = maxPriorityFeePerGas;
+        this.accessList = accessList;
+        this.maxFeePerBlobGas = maxFeePerBlobGas;
+        this.blobVersionedHashes = versionedHashes;
     }
 
     public void setChainId(String chainId) {
@@ -318,6 +376,14 @@ public class Transaction {
     //        this.v = v;
     //    }
 
+    public String getyParity() {
+        return yParity;
+    }
+
+    public void setyParity(String yParity) {
+        this.yParity = yParity;
+    }
+
     public Long getChainId() {
         if (chainId != null) {
             return Numeric.decodeQuantity(chainId).longValue();
@@ -369,6 +435,26 @@ public class Transaction {
 
     public void setAccessList(List<AccessListObject> accessList) {
         this.accessList = accessList;
+    }
+
+    public String getMaxFeePerBlobGasRaw() {
+        return maxFeePerBlobGas;
+    }
+
+    public BigInteger getMaxFeePerBlobGas() {
+        return Numeric.decodeQuantity(maxFeePerBlobGas);
+    }
+
+    public void setMaxFeePerBlobGas(String maxFeePerBlobGas) {
+        this.maxFeePerBlobGas = maxFeePerBlobGas;
+    }
+
+    public List<String> getBlobVersionedHashes() {
+        return blobVersionedHashes;
+    }
+
+    public void setBlobVersionedHashes(List<String> blobVersionedHashes) {
+        this.blobVersionedHashes = blobVersionedHashes;
     }
 
     @Override
@@ -455,6 +541,11 @@ public class Transaction {
         if (getR() != null ? !getR().equals(that.getR()) : that.getR() != null) {
             return false;
         }
+        if (getyParity() != null
+                ? !getyParity().equals(that.getyParity())
+                : that.getyParity() != null) {
+            return false;
+        }
         if (getType() != null ? !getType().equals(that.getType()) : that.getType() != null) {
             return false;
         }
@@ -466,6 +557,17 @@ public class Transaction {
         if (getMaxPriorityFeePerGasRaw() != null
                 ? !getMaxPriorityFeePerGasRaw().equals(that.getMaxPriorityFeePerGasRaw())
                 : that.getMaxPriorityFeePerGasRaw() != null) {
+            return false;
+        }
+
+        if (getMaxFeePerBlobGasRaw() != null
+                ? !getMaxFeePerBlobGasRaw().equals(that.getMaxFeePerBlobGasRaw())
+                : that.getMaxFeePerBlobGasRaw() != null) {
+            return false;
+        }
+        if (getBlobVersionedHashes() != null
+                ? !getBlobVersionedHashes().equals(that.getBlobVersionedHashes())
+                : that.getBlobVersionedHashes() != null) {
             return false;
         }
         if (getAccessList() != null
@@ -500,12 +602,23 @@ public class Transaction {
         result = 31 * result + (getR() != null ? getR().hashCode() : 0);
         result = 31 * result + (getS() != null ? getS().hashCode() : 0);
         result = 31 * result + BigInteger.valueOf(getV()).hashCode();
+        result = 31 * result + (getyParity() != null ? getyParity().hashCode() : 0);
         result = 31 * result + (getType() != null ? getType().hashCode() : 0);
         result = 31 * result + (getMaxFeePerGasRaw() != null ? getMaxFeePerGasRaw().hashCode() : 0);
         result =
                 31 * result
                         + (getMaxPriorityFeePerGasRaw() != null
                                 ? getMaxPriorityFeePerGasRaw().hashCode()
+                                : 0);
+        result =
+                31 * result
+                        + (getMaxFeePerBlobGasRaw() != null
+                                ? getMaxFeePerBlobGasRaw().hashCode()
+                                : 0);
+        result =
+                31 * result
+                        + (getBlobVersionedHashes() != null
+                                ? getBlobVersionedHashes().hashCode()
                                 : 0);
         result = 31 * result + (getAccessList() != null ? getAccessList().hashCode() : 0);
         return result;

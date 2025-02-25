@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.web3j.protocol.core.Response;
 import org.web3j.protocol.core.methods.response.Transaction;
@@ -49,17 +48,11 @@ public final class TxPoolContent extends Response<TxPoolContent.TxPoolContentRes
         }
 
         public List<Transaction> getPendingTransactions() {
-            return pending.values().stream()
-                    .map(Map::values)
-                    .flatMap(Collection::stream)
-                    .collect(Collectors.toList());
+            return pending.values().stream().map(Map::values).flatMap(Collection::stream).toList();
         }
 
         public List<Transaction> getQueuedTransactions() {
-            return queued.values().stream()
-                    .map(Map::values)
-                    .flatMap(Collection::stream)
-                    .collect(Collectors.toList());
+            return queued.values().stream().map(Map::values).flatMap(Collection::stream).toList();
         }
 
         private static <K, V> Map<K, V> immutableCopy(Map<K, V> map, Function<V, V> valueMapper) {

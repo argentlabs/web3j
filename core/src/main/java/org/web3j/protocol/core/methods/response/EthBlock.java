@@ -17,6 +17,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -61,6 +62,7 @@ public class EthBlock extends Response<EthBlock.Block> {
         private String number;
         private String hash;
         private String parentHash;
+        private String parentBeaconBlockRoot;
         private String nonce;
         private String sha3Uncles;
         private String logsBloom;
@@ -81,8 +83,71 @@ public class EthBlock extends Response<EthBlock.Block> {
         private List<String> uncles;
         private List<String> sealFields;
         private String baseFeePerGas;
+        private String withdrawalsRoot;
+        private List<Withdrawal> withdrawals;
+        private String blobGasUsed;
+        private String excessBlobGas;
 
         public Block() {}
+
+        public Block(
+                String number,
+                String hash,
+                String parentHash,
+                String parentBeaconBlockRoot,
+                String nonce,
+                String sha3Uncles,
+                String logsBloom,
+                String transactionsRoot,
+                String stateRoot,
+                String receiptsRoot,
+                String author,
+                String miner,
+                String mixHash,
+                String difficulty,
+                String totalDifficulty,
+                String extraData,
+                String size,
+                String gasLimit,
+                String gasUsed,
+                String timestamp,
+                List<TransactionResult> transactions,
+                List<String> uncles,
+                List<String> sealFields,
+                String baseFeePerGas,
+                String withdrawalsRoot,
+                List<Withdrawal> withdrawals,
+                String blobGasUsed,
+                String excessBlobGas) {
+            this.number = number;
+            this.hash = hash;
+            this.parentHash = parentHash;
+            this.parentBeaconBlockRoot = parentBeaconBlockRoot;
+            this.nonce = nonce;
+            this.sha3Uncles = sha3Uncles;
+            this.logsBloom = logsBloom;
+            this.transactionsRoot = transactionsRoot;
+            this.stateRoot = stateRoot;
+            this.receiptsRoot = receiptsRoot;
+            this.author = author;
+            this.miner = miner;
+            this.mixHash = mixHash;
+            this.difficulty = difficulty;
+            this.totalDifficulty = totalDifficulty;
+            this.extraData = extraData;
+            this.size = size;
+            this.gasLimit = gasLimit;
+            this.gasUsed = gasUsed;
+            this.timestamp = timestamp;
+            this.transactions = transactions;
+            this.uncles = uncles;
+            this.sealFields = sealFields;
+            this.baseFeePerGas = baseFeePerGas;
+            this.withdrawalsRoot = withdrawalsRoot;
+            this.withdrawals = withdrawals;
+            this.blobGasUsed = blobGasUsed;
+            this.excessBlobGas = excessBlobGas;
+        }
 
         public Block(
                 String number,
@@ -107,7 +172,9 @@ public class EthBlock extends Response<EthBlock.Block> {
                 List<TransactionResult> transactions,
                 List<String> uncles,
                 List<String> sealFields,
-                String baseFeePerGas) {
+                String baseFeePerGas,
+                String withdrawalsRoot,
+                List<Withdrawal> withdrawals) {
             this.number = number;
             this.hash = hash;
             this.parentHash = parentHash;
@@ -131,6 +198,8 @@ public class EthBlock extends Response<EthBlock.Block> {
             this.uncles = uncles;
             this.sealFields = sealFields;
             this.baseFeePerGas = baseFeePerGas;
+            this.withdrawalsRoot = withdrawalsRoot;
+            this.withdrawals = withdrawals;
         }
 
         public BigInteger getNumber() {
@@ -159,6 +228,14 @@ public class EthBlock extends Response<EthBlock.Block> {
 
         public void setParentHash(String parentHash) {
             this.parentHash = parentHash;
+        }
+
+        public String getParentBeaconBlockRoot() {
+            return parentBeaconBlockRoot;
+        }
+
+        public void setParentBeaconBlockRoot(String parentBeaconBlockRoot) {
+            this.parentBeaconBlockRoot = parentBeaconBlockRoot;
         }
 
         public BigInteger getNonce() {
@@ -354,6 +431,50 @@ public class EthBlock extends Response<EthBlock.Block> {
             return baseFeePerGas;
         }
 
+        public String getWithdrawalsRoot() {
+            return withdrawalsRoot;
+        }
+
+        public void setWithdrawalsRoot(String withdrawalsRoot) {
+            this.withdrawalsRoot = withdrawalsRoot;
+        }
+
+        public List<Withdrawal> getWithdrawals() {
+            return withdrawals;
+        }
+
+        public void setWithdrawals(List<Withdrawal> withdrawals) {
+            this.withdrawals = withdrawals;
+        }
+
+        public BigInteger getBlobGasUsed() {
+            if (blobGasUsed == null) return BigInteger.ZERO;
+            return Numeric.decodeQuantity(blobGasUsed);
+        }
+
+        public String getBlobGasUsedRaw() {
+            if (blobGasUsed == null) return "0";
+            return blobGasUsed;
+        }
+
+        public void setBlobGasUsed(String blobGasUsed) {
+            this.blobGasUsed = blobGasUsed;
+        }
+
+        public BigInteger getExcessBlobGas() {
+            if (excessBlobGas == null) return BigInteger.ZERO;
+            return Numeric.decodeQuantity(excessBlobGas);
+        }
+
+        public String getExcessBlobGasRaw() {
+            if (excessBlobGas == null) return "0";
+            return excessBlobGas;
+        }
+
+        public void setExcessBlobGas(String excessBlobGas) {
+            this.excessBlobGas = excessBlobGas;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -376,6 +497,11 @@ public class EthBlock extends Response<EthBlock.Block> {
             if (getParentHash() != null
                     ? !getParentHash().equals(block.getParentHash())
                     : block.getParentHash() != null) {
+                return false;
+            }
+            if (getParentBeaconBlockRoot() != null
+                    ? !getParentBeaconBlockRoot().equals(block.getParentBeaconBlockRoot())
+                    : block.getParentBeaconBlockRoot() != null) {
                 return false;
             }
             if (getNonceRaw() != null
@@ -475,9 +601,33 @@ public class EthBlock extends Response<EthBlock.Block> {
                 return false;
             }
 
-            return getSealFields() != null
-                    ? getSealFields().equals(block.getSealFields())
-                    : block.getSealFields() == null;
+            if (getSealFields() != null
+                    ? !getSealFields().equals(block.getSealFields())
+                    : block.getSealFields() != null) {
+                return false;
+            }
+
+            if (getBlobGasUsedRaw() != null
+                    ? !getBlobGasUsedRaw().equals(block.getBlobGasUsedRaw())
+                    : block.getBlobGasUsedRaw() != null) {
+                return false;
+            }
+
+            if (getExcessBlobGasRaw() != null
+                    ? !getExcessBlobGasRaw().equals(block.getExcessBlobGasRaw())
+                    : block.getExcessBlobGasRaw() != null) {
+                return false;
+            }
+
+            if (getWithdrawalsRoot() != null
+                    ? !getWithdrawalsRoot().equals(block.getWithdrawalsRoot())
+                    : block.getWithdrawalsRoot() != null) {
+                return false;
+            }
+
+            return getWithdrawals() != null
+                    ? getWithdrawals().equals(block.getWithdrawals())
+                    : block.getWithdrawals() == null;
         }
 
         @Override
@@ -485,6 +635,11 @@ public class EthBlock extends Response<EthBlock.Block> {
             int result = getNumberRaw() != null ? getNumberRaw().hashCode() : 0;
             result = 31 * result + (getHash() != null ? getHash().hashCode() : 0);
             result = 31 * result + (getParentHash() != null ? getParentHash().hashCode() : 0);
+            result =
+                    31 * result
+                            + (getParentBeaconBlockRoot() != null
+                                    ? getParentBeaconBlockRoot().hashCode()
+                                    : 0);
             result = 31 * result + (getNonceRaw() != null ? getNonceRaw().hashCode() : 0);
             result = 31 * result + (getSha3Uncles() != null ? getSha3Uncles().hashCode() : 0);
             result = 31 * result + (getLogsBloom() != null ? getLogsBloom().hashCode() : 0);
@@ -516,6 +671,18 @@ public class EthBlock extends Response<EthBlock.Block> {
                     31 * result
                             + (getBaseFeePerGasRaw() != null
                                     ? getBaseFeePerGasRaw().hashCode()
+                                    : 0);
+            result =
+                    31 * result
+                            + (getWithdrawalsRoot() != null ? getWithdrawalsRoot().hashCode() : 0);
+            result = 31 * result + (getWithdrawals() != null ? getWithdrawals().hashCode() : 0);
+            result =
+                    31 * result
+                            + (getBlobGasUsedRaw() != null ? getBlobGasUsedRaw().hashCode() : 0);
+            result =
+                    31 * result
+                            + (getExcessBlobGasRaw() != null
+                                    ? getExcessBlobGasRaw().hashCode()
                                     : 0);
             return result;
         }
@@ -634,6 +801,7 @@ public class EthBlock extends Response<EthBlock.Block> {
                 String r,
                 String s,
                 long v,
+                String yParity,
                 String type,
                 String maxFeePerGas,
                 String maxPriorityFeePerGas,
@@ -657,10 +825,65 @@ public class EthBlock extends Response<EthBlock.Block> {
                     r,
                     s,
                     v,
+                    yParity,
                     type,
                     maxFeePerGas,
                     maxPriorityFeePerGas,
                     accessList);
+        }
+
+        public TransactionObject(
+                String hash,
+                String nonce,
+                String blockHash,
+                String blockNumber,
+                String chainId,
+                String transactionIndex,
+                String from,
+                String to,
+                String value,
+                String gasPrice,
+                String gas,
+                String input,
+                String creates,
+                String publicKey,
+                String raw,
+                String r,
+                String s,
+                long v,
+                String yParity,
+                String type,
+                String maxFeePerGas,
+                String maxPriorityFeePerGas,
+                List<AccessListObject> accessList,
+                String maxFeePerBlobGas,
+                List<String> blobVersionedHashes) {
+            super(
+                    hash,
+                    nonce,
+                    blockHash,
+                    blockNumber,
+                    chainId,
+                    transactionIndex,
+                    from,
+                    to,
+                    value,
+                    gas,
+                    gasPrice,
+                    input,
+                    creates,
+                    publicKey,
+                    raw,
+                    r,
+                    s,
+                    v,
+                    yParity,
+                    type,
+                    maxFeePerGas,
+                    maxPriorityFeePerGas,
+                    accessList,
+                    maxFeePerBlobGas,
+                    blobVersionedHashes);
         }
 
         @Override
@@ -699,6 +922,70 @@ public class EthBlock extends Response<EthBlock.Block> {
             }
 
             return transactionResults;
+        }
+    }
+
+    public static class Withdrawal {
+        private String index;
+        private String validatorIndex;
+        private String address;
+        private String amount;
+
+        public Withdrawal() {}
+
+        public Withdrawal(String index, String validatorIndex, String address, String amount) {
+            this.index = index;
+            this.validatorIndex = validatorIndex;
+            this.address = address;
+            this.amount = amount;
+        }
+
+        public String getIndex() {
+            return index;
+        }
+
+        public void setIndex(String index) {
+            this.index = index;
+        }
+
+        public String getValidatorIndex() {
+            return validatorIndex;
+        }
+
+        public void setValidatorIndex(String validatorIndex) {
+            this.validatorIndex = validatorIndex;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
+
+        public BigInteger getAmount() {
+            return Numeric.decodeQuantity(amount);
+        }
+
+        public void setAmount(String amount) {
+            this.amount = amount;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Withdrawal that = (Withdrawal) o;
+            return Objects.equals(index, that.index)
+                    && Objects.equals(validatorIndex, that.validatorIndex)
+                    && Objects.equals(address, that.address)
+                    && Objects.equals(amount, that.amount);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(index, validatorIndex, address, amount);
         }
     }
 

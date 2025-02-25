@@ -1,14 +1,28 @@
+plugins {
+    id 'java-library'
+}
 
 description 'web3j Ethereum crypto library'
 
 dependencies {
-    compile project(':abi'),
+    api project(':abi'),
             project(':rlp'),
             project(':utils'),
             "org.slf4j:slf4j-api:$slf4jVersion",
-            "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+            "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
+            "io.consensys.protocols:jc-kzg-4844:$kzg4844Version"
+    implementation("io.tmio:tuweni-bytes:$tuweniVersion")
+    implementation("io.tmio:tuweni-units:$tuweniVersion")
 }
 
 configurations { testArtifacts.extendsFrom testRuntime }
 
 artifacts { testArtifacts testsJar }
+
+tasks.named("spotlessJava").configure {
+    dependsOn("spotlessGroovyGradle", "compileJava", "compileTestJava", "javadoc", "test", "jacocoTestReport")
+}
+
+tasks.named("spotlessKotlin").configure {
+    dependsOn("compileJava", "spotlessJava", "spotlessGroovyGradle", "compileTestJava", "processTestResources", "javadoc", "test", "jacocoTestReport")
+}

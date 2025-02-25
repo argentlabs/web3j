@@ -1,12 +1,14 @@
 import java.text.SimpleDateFormat
 
-apply plugin: 'org.ajoberstar.git-publish'
-
+plugins {
+    id 'java-library'
+    id 'org.ajoberstar.git-publish'
+}
 
 description 'web3j is a lightweight Java library for integration with Ethereum clients'
 
 dependencies {
-    compile project(':abi'),
+    api project(':abi'),
             project(':crypto'),
             project(':tuples'),
             "com.github.jnr:jnr-unixsocket:$jnr_unixsocketVersion",
@@ -15,8 +17,12 @@ dependencies {
             "io.reactivex.rxjava2:rxjava:$rxjavaVersion",
             "org.java-websocket:Java-WebSocket:$javaWebSocketVersion",
             "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
-            "org.slf4j:slf4j-api:$slf4jVersion"
-    testCompile project(path: ':crypto', configuration: 'testArtifacts'),
+            "org.slf4j:slf4j-api:$slf4jVersion",
+            "io.github.adraffy:ens-normalize:$ensAdraffyVersion",
+            "io.tmio:tuweni-bytes:$tuweniVersion",
+            "io.tmio:tuweni-units:$tuweniVersion"
+    implementation "software.amazon.awssdk:kms:$awsSdkVersion"
+    testImplementation project(path: ':crypto', configuration: 'testArtifacts'),
     "nl.jqno.equalsverifier:equalsverifier:$equalsverifierVersion",
     "ch.qos.logback:logback-classic:$logbackVersion"
 }
@@ -49,13 +55,12 @@ gitPublish {
 
     if (ghToken) {
         repoUri = "https://github.com/${docsPath}.git"
-
     } else {
         repoUri = "git@github.com:${docsPath}.git"
     }
 
     // branch will be created if it doesn't exist
-    branch = 'master'
+    branch = 'main'
 
     def coreDocs = files("${buildDir.path}/docs/javadoc/")
 
@@ -78,3 +83,11 @@ classes { dependsOn createProperties }
 configurations { testArtifacts.extendsFrom testRuntime }
 
 artifacts { testArtifacts testsJar }
+
+tasks.named("spotlessJava").configure {
+    dependsOn("spotlessGroovyGradle", "compileJava", "compileTestJava", "javadoc", "test", "jacocoTestReport")
+}
+
+tasks.named("spotlessKotlin").configure {
+    dependsOn("compileJava", "spotlessJava", "spotlessGroovyGradle", "compileTestJava", "processTestResources", "javadoc", "test", "jacocoTestReport")
+}

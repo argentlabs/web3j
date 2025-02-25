@@ -200,7 +200,7 @@ public class AbiDefinition {
     }
 
     public static class NamedType {
-        private static String DEFAULT_INTERNAL_TYPE = "";
+        private static final String DEFAULT_INTERNAL_TYPE = "";
 
         private String name;
         private String type;
@@ -275,12 +275,11 @@ public class AbiDefinition {
             this.components = components;
         }
 
-        public int structIdentifier() {
+        public String structIdentifier() {
             return ((internalType == null ? type : internalType.isEmpty() ? type : internalType)
-                            + components.stream()
-                                    .map(namedType -> String.valueOf(namedType.structIdentifier()))
-                                    .collect(Collectors.joining()))
-                    .hashCode();
+                    + components.stream()
+                            .map(NamedType::structIdentifier)
+                            .collect(Collectors.joining()));
         }
 
         public int nestedness() {
@@ -349,6 +348,6 @@ public class AbiDefinition {
     }
 
     private static List<NamedType> clone(final List<NamedType> from) {
-        return from.stream().map(NamedType::new).collect(Collectors.toList());
+        return from.stream().map(NamedType::new).toList();
     }
 }

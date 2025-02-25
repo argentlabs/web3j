@@ -25,7 +25,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class JsonRpc2_0Web3jTest {
+class JsonRpc2_0Web3jTest {
 
     private ScheduledExecutorService scheduledExecutorService =
             mock(ScheduledExecutorService.class);
@@ -34,15 +34,14 @@ public class JsonRpc2_0Web3jTest {
     private Web3j web3j = Web3j.build(service, 10, scheduledExecutorService);
 
     @Test
-    public void testStopExecutorOnShutdown() throws Exception {
+    void testStopExecutorOnShutdown() throws Exception {
         web3j.shutdown();
 
-        verify(scheduledExecutorService).shutdown();
-        verify(service).close();
+        verifyServicesClosed();
     }
 
     @Test
-    public void testExceptionOnServiceClosure() throws Exception {
+    void testExceptionOnServiceClosure() {
 
         assertThrows(
                 RuntimeException.class,
@@ -51,5 +50,16 @@ public class JsonRpc2_0Web3jTest {
 
                     web3j.shutdown();
                 });
+    }
+
+    @Test
+    void shouldShutdownOnAutoClose() throws Exception {
+        try (Web3j web3j = Web3j.build(service, 10, scheduledExecutorService)) {}
+        verifyServicesClosed();
+    }
+
+    private void verifyServicesClosed() throws IOException {
+        verify(scheduledExecutorService).shutdown();
+        verify(service).close();
     }
 }

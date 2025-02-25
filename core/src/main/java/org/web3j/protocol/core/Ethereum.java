@@ -22,6 +22,7 @@ import org.web3j.protocol.core.methods.response.DbGetString;
 import org.web3j.protocol.core.methods.response.DbPutHex;
 import org.web3j.protocol.core.methods.response.DbPutString;
 import org.web3j.protocol.core.methods.response.EthAccounts;
+import org.web3j.protocol.core.methods.response.EthBaseFee;
 import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthBlockNumber;
 import org.web3j.protocol.core.methods.response.EthChainId;
@@ -34,10 +35,12 @@ import org.web3j.protocol.core.methods.response.EthFeeHistory;
 import org.web3j.protocol.core.methods.response.EthFilter;
 import org.web3j.protocol.core.methods.response.EthGasPrice;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
+import org.web3j.protocol.core.methods.response.EthGetBlockReceipts;
 import org.web3j.protocol.core.methods.response.EthGetBlockTransactionCountByHash;
 import org.web3j.protocol.core.methods.response.EthGetBlockTransactionCountByNumber;
 import org.web3j.protocol.core.methods.response.EthGetCode;
 import org.web3j.protocol.core.methods.response.EthGetCompilers;
+import org.web3j.protocol.core.methods.response.EthGetProof;
 import org.web3j.protocol.core.methods.response.EthGetStorageAt;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
@@ -111,21 +114,10 @@ public interface Ethereum {
 
     Request<?, EthMaxPriorityFeePerGas> ethMaxPriorityFeePerGas();
 
-    @Deprecated
-    /**
-     * Method receives wrong type parameter int for blockCount, according to documentation the type
-     * should be String which is the encoded hex of the blocks number. This is kept for backward
-     * compatibility
-     *
-     * @param blockCount Requested range of blocks
-     * @param newestBlock Highest block of the requested range.
-     * @param rewardPercentiles A monotonically increasing list of percentile values.
-     */
-    Request<?, EthFeeHistory> ethFeeHistory(
-            int blockCount, DefaultBlockParameter newestBlock, List<Double> rewardPercentiles);
+    Request<?, EthBaseFee> ethBaseFee();
 
     Request<?, EthFeeHistory> ethFeeHistory(
-            String blockCount, DefaultBlockParameter newestBlock, List<Double> rewardPercentiles);
+            int blockCount, DefaultBlockParameter newestBlock, List<Double> rewardPercentiles);
 
     Request<?, EthAccounts> ethAccounts();
 
@@ -183,6 +175,9 @@ public interface Ethereum {
 
     Request<?, EthGetTransactionReceipt> ethGetTransactionReceipt(String transactionHash);
 
+    Request<?, EthGetBlockReceipts> ethGetBlockReceipts(
+            DefaultBlockParameter defaultBlockParameter);
+
     Request<?, EthBlock> ethGetUncleByBlockHashAndIndex(
             String blockHash, BigInteger transactionIndex);
 
@@ -210,6 +205,8 @@ public interface Ethereum {
     Request<?, EthLog> ethGetFilterLogs(BigInteger filterId);
 
     Request<?, EthLog> ethGetLogs(org.web3j.protocol.core.methods.request.EthFilter ethFilter);
+
+    Request<?, EthGetProof> ethGetProof(String address, List<String> storageKeys, String quantity);
 
     Request<?, EthGetWork> ethGetWork();
 

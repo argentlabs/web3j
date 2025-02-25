@@ -14,28 +14,71 @@ package org.web3j.ens;
 
 import org.junit.jupiter.api.Test;
 
-import org.web3j.tx.ChainId;
+import org.web3j.tx.ChainIdLong;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.web3j.ens.Contracts.HOLESKY;
+import static org.web3j.ens.Contracts.LINEA;
+import static org.web3j.ens.Contracts.LINEA_SEPOLIA;
 import static org.web3j.ens.Contracts.MAINNET;
 import static org.web3j.ens.Contracts.RINKEBY;
 import static org.web3j.ens.Contracts.ROPSTEN;
+import static org.web3j.ens.Contracts.SEPOLIA;
 import static org.web3j.ens.Contracts.resolveRegistryContract;
+import static org.web3j.ens.NameWrapperUrl.getEnsMetadataApi;
+import static org.web3j.ens.ReverseRegistrarContracts.resolveReverseRegistrarContract;
 
 @SuppressWarnings("deprecation")
-public class ContractsTest {
+class ContractsTest {
 
     @Test
-    public void testResolveRegistryContract() {
-        assertEquals(resolveRegistryContract(ChainId.MAINNET + ""), (MAINNET));
-        assertEquals(resolveRegistryContract(ChainId.ROPSTEN + ""), (ROPSTEN));
-        assertEquals(resolveRegistryContract(ChainId.RINKEBY + ""), (RINKEBY));
+    void testResolveRegistryContract() {
+        assertEquals(resolveRegistryContract(ChainIdLong.MAINNET + ""), (MAINNET));
+        assertEquals(resolveRegistryContract(ChainIdLong.ROPSTEN + ""), (ROPSTEN));
+        assertEquals(resolveRegistryContract(ChainIdLong.RINKEBY + ""), (RINKEBY));
+        assertEquals(resolveRegistryContract(ChainIdLong.SEPOLIA + ""), (SEPOLIA));
+        assertEquals(resolveRegistryContract(ChainIdLong.HOLESKY + ""), (HOLESKY));
+        assertEquals(resolveRegistryContract(ChainIdLong.LINEA + ""), (LINEA));
+        assertEquals(resolveRegistryContract(ChainIdLong.LINEA_SEPOLIA + ""), (LINEA_SEPOLIA));
     }
 
     @Test
-    public void testResolveRegistryContractInvalid() {
+    void testReverseRegistrarContract() {
+        assertEquals(
+                resolveReverseRegistrarContract(ChainIdLong.MAINNET + ""),
+                (ReverseRegistrarContracts.MAINNET));
+        assertEquals(
+                resolveReverseRegistrarContract(ChainIdLong.SEPOLIA + ""),
+                (ReverseRegistrarContracts.SEPOLIA));
+        assertEquals(
+                resolveReverseRegistrarContract(ChainIdLong.HOLESKY + ""),
+                (ReverseRegistrarContracts.HOLESKY));
+        assertEquals(
+                resolveReverseRegistrarContract(ChainIdLong.LINEA + ""),
+                (ReverseRegistrarContracts.LINEA));
+        assertEquals(
+                resolveReverseRegistrarContract(ChainIdLong.LINEA_SEPOLIA + ""),
+                (ReverseRegistrarContracts.LINEA_SEPOLIA));
+    }
+
+    @Test
+    void testNameWrapperApiLinks() {
+        assertEquals(getEnsMetadataApi(ChainIdLong.MAINNET + ""), (NameWrapperUrl.MAINNET_URL));
+        assertEquals(getEnsMetadataApi(ChainIdLong.SEPOLIA + ""), (NameWrapperUrl.SEPOLIA_URL));
+        assertEquals(getEnsMetadataApi(ChainIdLong.HOLESKY + ""), (NameWrapperUrl.HOLESKY_URL));
+    }
+
+    @Test
+    void testResolveRegistryContractInvalid() {
         assertThrows(
-                EnsResolutionException.class, () -> resolveRegistryContract(ChainId.NONE + ""));
+                EnsResolutionException.class, () -> resolveRegistryContract(ChainIdLong.NONE + ""));
+    }
+
+    @Test
+    void testReverseRegistrarContractInvalid() {
+        assertThrows(
+                EnsResolutionException.class,
+                () -> resolveReverseRegistrarContract(ChainIdLong.NONE + ""));
     }
 }

@@ -26,6 +26,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.web3j.crypto.exception.CipherException;
 import org.web3j.utils.Numeric;
 
 import static org.web3j.crypto.Hash.sha256;
@@ -44,29 +45,41 @@ public class WalletUtils {
     }
 
     public static String generateFullNewWalletFile(String password, File destinationDirectory)
-            throws NoSuchAlgorithmException, NoSuchProviderException,
-                    InvalidAlgorithmParameterException, CipherException, IOException {
+            throws NoSuchAlgorithmException,
+                    NoSuchProviderException,
+                    InvalidAlgorithmParameterException,
+                    CipherException,
+                    IOException {
 
         return generateNewWalletFile(password, destinationDirectory, true);
     }
 
     public static String generateLightNewWalletFile(String password, File destinationDirectory)
-            throws NoSuchAlgorithmException, NoSuchProviderException,
-                    InvalidAlgorithmParameterException, CipherException, IOException {
+            throws NoSuchAlgorithmException,
+                    NoSuchProviderException,
+                    InvalidAlgorithmParameterException,
+                    CipherException,
+                    IOException {
 
         return generateNewWalletFile(password, destinationDirectory, false);
     }
 
     public static String generateNewWalletFile(String password, File destinationDirectory)
-            throws CipherException, InvalidAlgorithmParameterException, NoSuchAlgorithmException,
-                    NoSuchProviderException, IOException {
+            throws CipherException,
+                    InvalidAlgorithmParameterException,
+                    NoSuchAlgorithmException,
+                    NoSuchProviderException,
+                    IOException {
         return generateFullNewWalletFile(password, destinationDirectory);
     }
 
     public static String generateNewWalletFile(
             String password, File destinationDirectory, boolean useFullScrypt)
-            throws CipherException, IOException, InvalidAlgorithmParameterException,
-                    NoSuchAlgorithmException, NoSuchProviderException {
+            throws CipherException,
+                    IOException,
+                    InvalidAlgorithmParameterException,
+                    NoSuchAlgorithmException,
+                    NoSuchProviderException {
 
         ECKeyPair ecKeyPair = Keys.createEcKeyPair();
         return generateWalletFile(password, ecKeyPair, destinationDirectory, useFullScrypt);

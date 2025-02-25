@@ -82,6 +82,7 @@ public class WebSocketService implements Web3jService {
     // subscription events
     private Map<Long, WebSocketSubscription<?>> subscriptionRequestForId =
             new ConcurrentHashMap<>();
+
     // Map of a subscription id to objects necessary to process incoming events
     private Map<String, WebSocketSubscription<?>> subscriptionForId = new ConcurrentHashMap<>();
 
@@ -120,6 +121,17 @@ public class WebSocketService implements Web3jService {
             Thread.currentThread().interrupt();
             log.warn("Interrupted while connecting via WebSocket protocol");
         }
+    }
+
+    /**
+     * Returns the immutable versions of subscriptionForId map which represents the relation between
+     * subscription id and the associated subscription events. Is kept immutable because the only
+     * way in which the subscription should be updated is only through Dispose object.
+     *
+     * @return immutable versions of subscriptionForId
+     */
+    public Map<String, WebSocketSubscription<?>> getSubscriptionIdsMap() {
+        return Collections.unmodifiableMap(subscriptionForId);
     }
 
     private void connectToWebSocket() throws InterruptedException, ConnectException {
@@ -287,7 +299,7 @@ public class WebSocketService implements Web3jService {
             }
 
             sendReplyToListener(request, reply);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             sendExceptionToListener(replyStr, request, e);
         }
     }
@@ -310,7 +322,7 @@ public class WebSocketService implements Web3jService {
             }
 
             sendReplyToListener(webSocketRequests, new BatchResponse(requests, responses));
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             sendExceptionToListener(replyStr, webSocketRequests, e);
         }
     }
@@ -362,8 +374,7 @@ public class WebSocketService implements Web3jService {
         request.getOnReply().complete(reply);
     }
 
-    private void sendExceptionToListener(
-            String replyStr, WebSocketRequest request, IllegalArgumentException e) {
+    private void sendExceptionToListener(String replyStr, WebSocketRequest request, Exception e) {
         request.getOnReply()
                 .completeExceptionally(
                         new IOException(
@@ -545,6 +556,7 @@ public class WebSocketService implements Web3jService {
                                 request.getOnReply()
                                         .completeExceptionally(
                                                 new IOException("Connection was closed")));
+        requestForId.clear();
     }
 
     private void closeOutstandingSubscriptions() {
@@ -555,6 +567,7 @@ public class WebSocketService implements Web3jService {
                                 subscription
                                         .getSubject()
                                         .onError(new IOException("Connection was closed")));
+        subscriptionForId.clear();
     }
 
     // Method visible for unit-tests
